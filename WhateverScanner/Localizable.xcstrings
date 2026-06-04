@@ -11,6 +11,16 @@
         }
       }
     },
+    "Analyzing…" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird analysiert…"
+          }
+        }
+      }
+    },
     "Auto-Start Scanner on Launch" : {
       "localizations" : {
         "de" : {
@@ -51,12 +61,42 @@
         }
       }
     },
+    "Date" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datum"
+          }
+        }
+      }
+    },
     "Default Server" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Standardserver"
+          }
+        }
+      }
+    },
+    "Document Date" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dokumentdatum"
+          }
+        }
+      }
+    },
+    "Document Name" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dokumentname"
           }
         }
       }
@@ -107,6 +147,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fertig"
+          }
+        }
+      }
+    },
+    "Edit Details" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Details bearbeiten"
           }
         }
       }
@@ -254,6 +304,16 @@
         }
       }
     },
+    "Scan Date" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan-Datum"
+          }
+        }
+      }
+    },
     "Scan Document" : {
       "localizations" : {
         "de" : {
@@ -274,12 +334,38 @@
         }
       }
     },
+    "Scan Error" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan-Fehler"
+          }
+        }
+      }
+    },
     "Scan failed: %@" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Scan fehlgeschlagen: %@"
+          }
+        }
+      }
+    },
+    "Scan Preview" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschau"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview"
           }
         }
       }
@@ -475,6 +561,7 @@
       }
     },
     "Uploading…" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

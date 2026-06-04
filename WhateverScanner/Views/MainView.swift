@@ -2,15 +2,21 @@ import SwiftUI
 import VisionKit
 
 /// The primary view of the app, displaying the scan button and upload status.
-/// Handles document scanning via VisionKit and uploading scanned PDFs to configured WebDAV servers.
+/// Handles document scanning via VisionKit and presenting a preview with OCR-based suggestions.
 struct MainView: View {
     @EnvironmentObject var settings: AppSettings
 
     @State private var showScanner = false
     @State private var showSettings = false
-    @State private var isUploading = false
-    @State private var uploadStatus: UploadStatus?
-    @State private var showUploadResult = false
+    @State private var showScanError = false
+    @State private var scanErrorMessage = ""
+
+    // Preview state
+    @State private var showPreview = false
+    @State private var previewImages: [UIImage] = []
+    @State private var previewPDFData: Data?
+    @State private var previewDocumentInfo: OCRService.DocumentInfo?
+    @State private var isAnalyzing = false
 
     // MARK: - Body
 
@@ -30,8 +36,8 @@ struct MainView: View {
 
                 Spacer()
 
-                if isUploading {
-                    ProgressView("Uploading…")
+                if isAnalyzing {
+                    ProgressView("Analyzing…")
                         .controlSize(.large)
                 } else {
                     Button {
@@ -65,13 +71,23 @@ struct MainView: View {
                 }
                 .ignoresSafeArea()
             }
+            .fullScreenCover(isPresented: $showPreview) {
+                if let pdfData = previewPDFData, let docInfo = previewDocumentInfo {
+                    ScanPreviewView(
+                        images: previewImages,
+                        pdfData: pdfData,
+                        documentInfo: docInfo,
+                        onDismiss: { showPreview = false }
+                    )
+                }
+            }
             .sheet(isPresented: $showSettings) {
                 SettingsView()
             }
-            .alert(uploadAlertTitle, isPresented: $showUploadResult) {
+            .alert(String(localized: "Scan Error"), isPresented: $showScanError) {
                 Button("OK") {}
             } message: {
-                Text(uploadAlertMessage)
+                Text(scanErrorMessage)
             }
         }
         .onAppear {
@@ -99,96 +115,45 @@ struct MainView: View {
         }
     }
 
-    // MARK: - Alert Helpers
-
-    /// The title string for the upload result alert.
-    private var uploadAlertTitle: String {
-        guard let status = uploadStatus else { return "" }
-        if case .success = status { return String(localized: "Upload Successful") }
-        return String(localized: "Upload Failed")
-    }
-
-    /// The message body for the upload result alert.
-    private var uploadAlertMessage: String {
-        switch uploadStatus {
-        case .success(let count):
-            return String(localized: "Document uploaded to \(count) server(s).")
-        case .failure(let message):
-            return message
-        case nil:
-            return ""
-        }
-    }
-
     // MARK: - Scan Handling
 
-    /// Processes the result from the document camera, initiating upload on success.
+    /// Processes the result from the document camera, creating a PDF and running OCR analysis
+    /// before showing the preview.
     /// - Parameter result: The scan result containing either a `VNDocumentCameraScan` or an error.
     private func handleScanResult(_ result: Result<VNDocumentCameraScan, Error>) {
         switch result {
         case .success(let scan):
             guard scan.pageCount > 0 else { return }
-            Task { await uploadScan(scan) }
+            Task { await prepareScanPreview(scan) }
         case .failure(let error):
-            uploadStatus = .failure(String(localized: "Scan failed: \(error.localizedDescription)"))
-            showUploadResult = true
+            scanErrorMessage = String(localized: "Scan failed: \(error.localizedDescription)")
+            showScanError = true
         }
     }
 
-    /// Converts the scanned pages to a PDF and uploads it to the configured server(s).
+    /// Converts the scanned pages to a PDF, runs OCR analysis, and presents the preview.
     /// - Parameter scan: The document camera scan containing one or more pages.
     @MainActor
-    private func uploadScan(_ scan: VNDocumentCameraScan) async {
-        isUploading = true
+    private func prepareScanPreview(_ scan: VNDocumentCameraScan) async {
+        isAnalyzing = true
 
         let images = (0..<scan.pageCount).map { scan.imageOfPage(at: $0) }
 
         guard let pdfData = PDFService.shared.createPDF(from: images) else {
-            isUploading = false
-            uploadStatus = .failure(String(localized: "Failed to create PDF from the scanned pages."))
-            showUploadResult = true
+            isAnalyzing = false
+            scanErrorMessage = String(localized: "Failed to create PDF from the scanned pages.")
+            showScanError = true
             return
         }
 
-        let filename = PDFService.shared.generateFilename()
-        let targets = settings.uploadTargets
-        var successCount = 0
-        var errors: [String] = []
+        let documentInfo = await OCRService.shared.analyzeDocument(images: images)
 
-        for server in targets {
-            do {
-                try await WebDAVService.shared.upload(data: pdfData, filename: filename, to: server)
-                successCount += 1
-            } catch {
-                errors.append("\(server.name): \(error.localizedDescription)")
-            }
-        }
-
-        isUploading = false
-
-        if errors.isEmpty {
-            uploadStatus = .success(successCount)
-        } else if successCount > 0 {
-            let errorSummary = errors.joined(separator: "\n")
-            uploadStatus = .failure(
-                String(localized: "Uploaded to \(successCount) server(s), but failed:") + "\n" + errorSummary
-            )
-        } else {
-            let errorSummary = errors.joined(separator: "\n")
-            uploadStatus = .failure(String(localized: "Upload failed:") + "\n" + errorSummary)
-        }
-        showUploadResult = true
+        previewImages = images
+        previewPDFData = pdfData
+        previewDocumentInfo = documentInfo
+        isAnalyzing = false
+        showPreview = true
     }
-}
-
-// MARK: - UploadStatus
-
-/// Represents the outcome of a document upload operation.
-private enum UploadStatus {
-    /// Upload succeeded to the given number of servers.
-    case success(Int)
-    /// Upload failed with the given error message.
-    case failure(String)
 }
 
 #Preview {
