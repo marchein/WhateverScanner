@@ -18,6 +18,7 @@
 		AABBCCDD00000209AABBCCDD /* ScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABBCCDD00000109AABBCCDD /* ScannerView.swift */; };
 		AABBCCDD00000210AABBCCDD /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABBCCDD00000110AABBCCDD /* SettingsView.swift */; };
 		AABBCCDD00000211AABBCCDD /* AddServerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABBCCDD00000111AABBCCDD /* AddServerView.swift */; };
+		AABBCCDD00000219AABBCCDD /* LaunchScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABBCCDD00000119AABBCCDD /* LaunchScreenView.swift */; };
 		AABBCCDD00000212AABBCCDD /* WebDAVService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABBCCDD00000112AABBCCDD /* WebDAVService.swift */; };
 		AABBCCDD00000213AABBCCDD /* PDFService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABBCCDD00000113AABBCCDD /* PDFService.swift */; };
 		AABBCCDD00000214AABBCCDD /* WhateverScannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABBCCDD00000114AABBCCDD /* WhateverScannerTests.swift */; };
@@ -52,6 +53,7 @@
 		AABBCCDD00000109AABBCCDD /* ScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerView.swift; sourceTree = "<group>"; };
 		AABBCCDD00000110AABBCCDD /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		AABBCCDD00000111AABBCCDD /* AddServerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddServerView.swift; sourceTree = "<group>"; };
+		AABBCCDD00000119AABBCCDD /* LaunchScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreenView.swift; sourceTree = "<group>"; };
 		AABBCCDD00000112AABBCCDD /* WebDAVService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebDAVService.swift; sourceTree = "<group>"; };
 		AABBCCDD00000113AABBCCDD /* PDFService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFService.swift; sourceTree = "<group>"; };
 		AABBCCDD00000114AABBCCDD /* WhateverScannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhateverScannerTests.swift; sourceTree = "<group>"; };
@@ -121,6 +123,7 @@
 				AABBCCDD00000109AABBCCDD /* ScannerView.swift */,
 				AABBCCDD00000110AABBCCDD /* SettingsView.swift */,
 				AABBCCDD00000111AABBCCDD /* AddServerView.swift */,
+				AABBCCDD00000119AABBCCDD /* LaunchScreenView.swift */,
 				AABBCCDD00000118AABBCCDD /* ScanPreviewView.swift */,
 			);
 			path = Views;
@@ -257,6 +260,7 @@
 				AABBCCDD00000209AABBCCDD /* ScannerView.swift in Sources */,
 				AABBCCDD00000210AABBCCDD /* SettingsView.swift in Sources */,
 				AABBCCDD00000211AABBCCDD /* AddServerView.swift in Sources */,
+				AABBCCDD00000219AABBCCDD /* LaunchScreenView.swift in Sources */,
 				AABBCCDD00000212AABBCCDD /* WebDAVService.swift in Sources */,
 				AABBCCDD00000213AABBCCDD /* PDFService.swift in Sources */,
 				AABBCCDD00000215AABBCCDD /* KeychainService.swift in Sources */,
