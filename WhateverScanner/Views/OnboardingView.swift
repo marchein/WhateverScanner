@@ -148,7 +148,7 @@ struct OnboardingView: View {
         if !urlString.hasSuffix("/") { urlString += "/" }
 
         guard URL(string: urlString) != nil else {
-            errorMessage = "Please enter a valid server URL."
+            errorMessage = String(localized: "Please enter a valid server URL.")
             showError = true
             return
         }

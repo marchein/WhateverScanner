@@ -75,13 +75,13 @@ struct AddServerView: View {
                             if isTesting {
                                 ProgressView().padding(.trailing, 8)
                             }
-                            Text(isTesting ? "Testing…" : "Test Connection")
+                            Text(isTesting ? String(localized: "Testing…") : String(localized: "Test Connection"))
                         }
                     }
                     .disabled(!isFormValid || isTesting)
                 }
             }
-            .navigationTitle(isEditing ? "Edit Server" : "Add Server")
+            .navigationTitle(isEditing ? String(localized: "Edit Server") : String(localized: "Add Server"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -114,14 +114,14 @@ struct AddServerView: View {
 
     /// The title string for the connection test result alert.
     private var testResultTitle: String {
-        if case .success = testResult { return "Connection Successful" }
-        return "Connection Failed"
+        if case .success = testResult { return String(localized: "Connection Successful") }
+        return String(localized: "Connection Failed")
     }
 
     /// The message body for the connection test result alert.
     private var testResultMessage: String {
         switch testResult {
-        case .success:        return "Successfully connected to the server."
+        case .success:        return String(localized: "Successfully connected to the server.")
         case .failure(let m): return m
         case nil:             return ""
         }
