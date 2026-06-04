@@ -32,15 +32,18 @@ struct ScanPreviewView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
+                // Document info bar – full-width, clearly tappable
+                documentInfoBar
+
+                Divider()
+
                 // PDF Preview
                 PDFPreviewRepresentable(data: pdfData)
                     .ignoresSafeArea(edges: .bottom)
             }
+            .navigationTitle(String(localized: "Scan Preview"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .principal) {
-                    headerView
-                }
                 ToolbarItem(placement: .topBarLeading) {
                     Button(String(localized: "Cancel")) {
                         onDismiss()
@@ -80,23 +83,35 @@ struct ScanPreviewView: View {
         }
     }
 
-    // MARK: - Header
+    // MARK: - Document Info Bar
 
-    /// The tappable header showing the current document name and date.
-    private var headerView: some View {
+    /// A full-width tappable bar showing the document name and date with a clear edit affordance.
+    private var documentInfoBar: some View {
         Button {
             isEditingName = true
         } label: {
-            VStack(spacing: 2) {
-                Text(documentName)
-                    .font(.headline)
-                    .lineLimit(1)
-                Text(formattedDate)
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(documentName)
+                        .font(.headline)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+                        .foregroundStyle(.primary)
+                    Text(formattedDate)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Image(systemName: "pencil.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(.tint)
             }
+            .padding(.horizontal)
+            .padding(.vertical, 12)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .background(.bar)
     }
 
     // MARK: - Edit Sheet
