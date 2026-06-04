@@ -135,7 +135,21 @@ struct ScanPreviewView: View {
         .presentationDetents([.medium])
     }
 
-    // MARK: - Date Helpers
+    // MARK: - Date Formatting
+
+    /// Cached formatters for date display to avoid repeated creation.
+    private static let mediumDateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateStyle = .medium
+        return f
+    }()
+
+    private static let mediumDateTimeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateStyle = .medium
+        f.timeStyle = .short
+        return f
+    }()
 
     /// The currently selected date based on the user's choice.
     private var selectedDate: Date {
@@ -149,26 +163,19 @@ struct ScanPreviewView: View {
 
     /// Formatted string for the currently selected date.
     private var formattedDate: String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .short
-        return formatter.string(from: selectedDate)
+        Self.mediumDateTimeFormatter.string(from: selectedDate)
     }
 
     /// Label for the scan date option showing today's date.
     private var scanDateLabel: String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        let dateStr = formatter.string(from: Date())
+        let dateStr = Self.mediumDateFormatter.string(from: Date())
         return String(localized: "Scan Date") + " (\(dateStr))"
     }
 
     /// Label for the document date option showing the OCR-detected date.
     private var documentDateLabel: String {
         guard let docDate = documentInfo.documentDate else { return "" }
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        let dateStr = formatter.string(from: docDate)
+        let dateStr = Self.mediumDateFormatter.string(from: docDate)
         return String(localized: "Document Date") + " (\(dateStr))"
     }
 
