@@ -10,7 +10,7 @@ class AppSettings: ObservableObject {
     }
 
     @Published var servers: [WebDAVServer] {
-        didSet { saveServers() }
+        didSet { persistServers() }
     }
 
     @Published var defaultServerId: UUID? {
@@ -50,8 +50,8 @@ class AppSettings: ObservableObject {
 
     init() {
         let defaults = UserDefaults.standard
-        self.isSetupComplete = defaults.bool(forKey: Keys.isSetupComplete)
-        self.autoStartScan = defaults.bool(forKey: Keys.autoStartScan)
+        self.isSetupComplete  = defaults.bool(forKey: Keys.isSetupComplete)
+        self.autoStartScan    = defaults.bool(forKey: Keys.autoStartScan)
         self.uploadToAllServers = defaults.bool(forKey: Keys.uploadToAllServers)
 
         if let uuidString = defaults.string(forKey: Keys.defaultServerId),
@@ -61,17 +61,13 @@ class AppSettings: ObservableObject {
             self.defaultServerId = nil
         }
 
-        if let data = defaults.data(forKey: Keys.servers),
-           let decoded = try? JSONDecoder().decode([WebDAVServer].self, from: data) {
-            self.servers = decoded
-        } else {
-            self.servers = []
-        }
+        self.servers = AppSettings.loadServers()
     }
 
     // MARK: - Server Management
 
     func addServer(_ server: WebDAVServer) {
+        savePasswordToKeychain(for: server)
         servers.append(server)
         if defaultServerId == nil {
             defaultServerId = server.id
@@ -80,12 +76,14 @@ class AppSettings: ObservableObject {
 
     func updateServer(_ server: WebDAVServer) {
         if let index = servers.firstIndex(where: { $0.id == server.id }) {
+            savePasswordToKeychain(for: server)
             servers[index] = server
         }
     }
 
     func removeServer(at offsets: IndexSet) {
         let removedIds = offsets.map { servers[$0].id }
+        removedIds.forEach { KeychainService.delete(forKey: $0.uuidString) }
         servers.remove(atOffsets: offsets)
         if removedIds.contains(where: { $0 == defaultServerId }) {
             defaultServerId = servers.first?.id
@@ -102,19 +100,36 @@ class AppSettings: ObservableObject {
 
     // MARK: - Persistence
 
-    private func saveServers() {
+    /// Persist server metadata to UserDefaults (passwords stay in Keychain).
+    private func persistServers() {
         if let data = try? JSONEncoder().encode(servers) {
             UserDefaults.standard.set(data, forKey: Keys.servers)
         }
     }
 
+    /// Load server metadata and restore passwords from Keychain.
+    private static func loadServers() -> [WebDAVServer] {
+        guard let data = UserDefaults.standard.data(forKey: Keys.servers),
+              var decoded = try? JSONDecoder().decode([WebDAVServer].self, from: data) else {
+            return []
+        }
+        for i in decoded.indices {
+            decoded[i].password = KeychainService.retrieve(forKey: decoded[i].id.uuidString) ?? ""
+        }
+        return decoded
+    }
+
+    private func savePasswordToKeychain(for server: WebDAVServer) {
+        try? KeychainService.save(password: server.password, forKey: server.id.uuidString)
+    }
+
     // MARK: - Keys
 
     private enum Keys {
-        static let isSetupComplete = "isSetupComplete"
-        static let servers = "servers"
-        static let defaultServerId = "defaultServerId"
-        static let autoStartScan = "autoStartScan"
+        static let isSetupComplete  = "isSetupComplete"
+        static let servers          = "servers"
+        static let defaultServerId  = "defaultServerId"
+        static let autoStartScan    = "autoStartScan"
         static let uploadToAllServers = "uploadToAllServers"
     }
 }

@@ -20,6 +20,7 @@
 		AABBCCDD00000212AABBCCDD /* WebDAVService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABBCCDD00000112AABBCCDD /* WebDAVService.swift */; };
 		AABBCCDD00000213AABBCCDD /* PDFService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABBCCDD00000113AABBCCDD /* PDFService.swift */; };
 		AABBCCDD00000214AABBCCDD /* WhateverScannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABBCCDD00000114AABBCCDD /* WhateverScannerTests.swift */; };
+		AABBCCDD00000215AABBCCDD /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABBCCDD00000115AABBCCDD /* KeychainService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +50,7 @@
 		AABBCCDD00000112AABBCCDD /* WebDAVService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebDAVService.swift; sourceTree = "<group>"; };
 		AABBCCDD00000113AABBCCDD /* PDFService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFService.swift; sourceTree = "<group>"; };
 		AABBCCDD00000114AABBCCDD /* WhateverScannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhateverScannerTests.swift; sourceTree = "<group>"; };
+		AABBCCDD00000115AABBCCDD /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +120,7 @@
 			children = (
 				AABBCCDD00000112AABBCCDD /* WebDAVService.swift */,
 				AABBCCDD00000113AABBCCDD /* PDFService.swift */,
+				AABBCCDD00000115AABBCCDD /* KeychainService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -241,6 +244,7 @@
 				AABBCCDD00000211AABBCCDD /* AddServerView.swift in Sources */,
 				AABBCCDD00000212AABBCCDD /* WebDAVService.swift in Sources */,
 				AABBCCDD00000213AABBCCDD /* PDFService.swift in Sources */,
+				AABBCCDD00000215AABBCCDD /* KeychainService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

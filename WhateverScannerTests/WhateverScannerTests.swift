@@ -28,7 +28,20 @@ final class WhateverScannerTests: XCTestCase {
         let server = WebDAVServer(name: "Test", url: "https://t.example.com/", username: "u", password: "p")
         let data = try JSONEncoder().encode(server)
         let decoded = try JSONDecoder().decode(WebDAVServer.self, from: data)
-        XCTAssertEqual(server, decoded)
+        // Metadata survives the round-trip
+        XCTAssertEqual(decoded.id,       server.id)
+        XCTAssertEqual(decoded.name,     server.name)
+        XCTAssertEqual(decoded.url,      server.url)
+        XCTAssertEqual(decoded.username, server.username)
+        // Password is NOT stored in JSON — it arrives empty from the decoder
+        XCTAssertEqual(decoded.password, "")
+    }
+
+    func testWebDAVServerPasswordNotInJSON() throws {
+        let server = WebDAVServer(name: "T", url: "https://t.example.com/", username: "u", password: "secret")
+        let data = try JSONEncoder().encode(server)
+        let json = String(data: data, encoding: .utf8) ?? ""
+        XCTAssertFalse(json.contains("secret"), "Password must not appear in serialised JSON")
     }
 
     // MARK: - AppSettings – server management
