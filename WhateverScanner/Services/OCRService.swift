@@ -131,11 +131,19 @@ class OCRService {
             return true
         }
 
-        // Combine company name and document type if both found
+        // Combine company name, document type, and subject if found
+        let subject = extractDocumentSubject(from: lines, documentType: documentType)
+
         if let company = companyName, let docType = documentType {
             let cleanCompany = cleanName(company)
+            if let subject = subject {
+                return "\(cleanCompany) - \(docType) \(subject)"
+            }
             return "\(cleanCompany) - \(docType)"
         } else if let docType = documentType {
+            if let subject = subject {
+                return "\(docType) \(subject)"
+            }
             return docType
         } else if let company = companyName {
             return cleanName(company)
@@ -144,13 +152,124 @@ class OCRService {
         return nil
     }
 
-    /// Cleans up a name string by trimming and truncating.
+    /// Cleans up a name string by trimming, removing trademark symbols, and truncating.
     private func cleanName(_ name: String) -> String {
-        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        if trimmed.count > 40 {
-            return String(trimmed.prefix(40)).trimmingCharacters(in: .whitespacesAndNewlines)
+        var cleaned = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Remove trademark/copyright symbols and their parenthesized forms
+        let trademarkPatterns = ["®", "©", "™", "℠"]
+        for symbol in trademarkPatterns {
+            cleaned = cleaned.replacingOccurrences(of: symbol, with: "")
         }
-        return trimmed
+        // Remove parenthesized trademark abbreviations like (c), (r), (tm), (sm)
+        if let regex = try? NSRegularExpression(pattern: #"\s*\((?:c|r|tm|sm)\)\s*"#, options: .caseInsensitive) {
+            cleaned = regex.stringByReplacingMatches(in: cleaned, range: NSRange(cleaned.startIndex..., in: cleaned), withTemplate: " ")
+        }
+        // Remove standalone TM/SM that follow a word
+        if let regex = try? NSRegularExpression(pattern: #"\s+(?:TM|SM)\b"#) {
+            cleaned = regex.stringByReplacingMatches(in: cleaned, range: NSRange(cleaned.startIndex..., in: cleaned), withTemplate: "")
+        }
+        cleaned = cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Collapse multiple spaces
+        while cleaned.contains("  ") {
+            cleaned = cleaned.replacingOccurrences(of: "  ", with: " ")
+        }
+        if cleaned.count > 40 {
+            return String(cleaned.prefix(40)).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        return cleaned
+    }
+
+    // MARK: - Document Subject Extraction
+
+    /// Attempts to extract what the document is about (e.g. a product or service name)
+    /// by looking for descriptive lines near document type keywords.
+    /// - Parameters:
+    ///   - lines: The recognized text lines from OCR.
+    ///   - documentType: The detected document type keyword, if any.
+    /// - Returns: A short subject description, or nil if none could be determined.
+    private func extractDocumentSubject(from lines: [String], documentType: String?) -> String? {
+        guard documentType != nil else { return nil }
+
+        // Keywords that hint at a product/service description line
+        let subjectHintPatterns: [(pattern: String, prefix: String)] = [
+            // German
+            ("bezeichnung", ""),
+            ("beschreibung", ""),
+            ("artikel", ""),
+            ("produkt", ""),
+            ("gegenstand", ""),
+            ("leistung", ""),
+            ("betreff", ""),
+            ("objekt", ""),
+            // English
+            ("description", ""),
+            ("item", ""),
+            ("product", ""),
+            ("subject", ""),
+            ("service", ""),
+            ("article", ""),
+            ("regarding", ""),
+            ("for:", ""),
+            ("re:", ""),
+        ]
+
+        // Strategy 1: Look for lines with subject-hint keywords and extract the value
+        for (index, line) in lines.enumerated() {
+            let lowered = line.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+            for hint in subjectHintPatterns {
+                if lowered.hasPrefix(hint.pattern) || lowered.contains(":\(hint.pattern)") || lowered.contains(": \(hint.pattern)") {
+                    // The value might be on the same line after a colon or on the next line
+                    if let colonIndex = line.firstIndex(of: ":") {
+                        let afterColon = String(line[line.index(after: colonIndex)...]).trimmingCharacters(in: .whitespacesAndNewlines)
+                        if afterColon.count >= 3 {
+                            return cleanSubject(afterColon)
+                        }
+                    }
+                    // Check next line
+                    if index + 1 < lines.count {
+                        let nextLine = lines[index + 1].trimmingCharacters(in: .whitespacesAndNewlines)
+                        if nextLine.count >= 3 && !nextLine.allSatisfy({ $0.isNumber || $0 == "." || $0 == "," || $0 == " " }) {
+                            return cleanSubject(nextLine)
+                        }
+                    }
+                }
+            }
+        }
+
+        // Strategy 2: Look for product-like lines in a table (lines containing quantity + description)
+        let tableLinePattern = try? NSRegularExpression(pattern: #"^\s*\d+\s+[A-Za-zÄÖÜäöüß]"#)
+        for line in lines {
+            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard trimmed.count >= 5 else { continue }
+            if let regex = tableLinePattern,
+               regex.firstMatch(in: trimmed, range: NSRange(trimmed.startIndex..., in: trimmed)) != nil {
+                // Extract the text part after the leading number(s)
+                if let match = try? NSRegularExpression(pattern: #"^\s*\d+\s+(.+?)(?:\s+\d+[.,]\d{2}\s*(?:€|\$|EUR|USD)?)?$"#),
+                   let result = match.firstMatch(in: trimmed, range: NSRange(trimmed.startIndex..., in: trimmed)),
+                   let range = Range(result.range(at: 1), in: trimmed) {
+                    let productName = String(trimmed[range]).trimmingCharacters(in: .whitespacesAndNewlines)
+                    if productName.count >= 3 {
+                        return cleanSubject(productName)
+                    }
+                }
+            }
+        }
+
+        return nil
+    }
+
+    /// Cleans and truncates a subject string for use in filenames.
+    private func cleanSubject(_ subject: String) -> String {
+        var cleaned = subject.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Remove trailing price-like patterns
+        if let regex = try? NSRegularExpression(pattern: #"\s*\d+[.,]\d{2}\s*(?:€|\$|EUR|USD)?\s*$"#) {
+            cleaned = regex.stringByReplacingMatches(in: cleaned, range: NSRange(cleaned.startIndex..., in: cleaned), withTemplate: "")
+        }
+        cleaned = cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
+        if cleaned.count > 30 {
+            cleaned = String(cleaned.prefix(30)).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        return cleaned
     }
 
     // MARK: - Date Extraction

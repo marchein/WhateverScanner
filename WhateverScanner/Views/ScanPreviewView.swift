@@ -56,6 +56,7 @@ struct ScanPreviewView: View {
                         } label: {
                             Label(String(localized: "Upload"), systemImage: "square.and.arrow.up")
                         }
+                        .buttonStyle(.borderedProminent)
                     }
                 }
             }
