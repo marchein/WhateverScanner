@@ -45,8 +45,10 @@ struct ScanPreviewView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button(String(localized: "Cancel")) {
+                    Button {
                         onDismiss()
+                    } label: {
+                        Label(String(localized: "Cancel"), systemImage: "xmark")
                     }
                     .disabled(isUploading)
                 }
