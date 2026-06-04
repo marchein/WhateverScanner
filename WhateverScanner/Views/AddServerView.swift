@@ -1,5 +1,7 @@
 import SwiftUI
 
+/// Form view for adding a new WebDAV server or editing an existing one.
+/// Supports connection testing via PROPFIND before saving.
 struct AddServerView: View {
     @EnvironmentObject var settings: AppSettings
     @Environment(\.dismiss) private var dismiss
@@ -18,6 +20,8 @@ struct AddServerView: View {
 
     // MARK: - Init
 
+    /// Initializes the view, optionally pre-populating fields from an existing server for editing.
+    /// - Parameter server: An existing server to edit, or `nil` to create a new one.
     init(server: WebDAVServer? = nil) {
         self.existingServer = server
         _name     = State(initialValue: server?.name     ?? "")
@@ -26,6 +30,7 @@ struct AddServerView: View {
         _password = State(initialValue: server?.password ?? "")
     }
 
+    /// Whether editing an existing server (true) or adding a new one (false).
     private var isEditing: Bool { existingServer != nil }
 
     // MARK: - Body
@@ -97,6 +102,7 @@ struct AddServerView: View {
 
     // MARK: - Validation
 
+    /// Whether all required server fields have been filled in.
     private var isFormValid: Bool {
         !name.trimmingCharacters(in: .whitespaces).isEmpty &&
         !url.trimmingCharacters(in: .whitespaces).isEmpty &&
@@ -106,11 +112,13 @@ struct AddServerView: View {
 
     // MARK: - Alert Helpers
 
+    /// The title string for the connection test result alert.
     private var testResultTitle: String {
         if case .success = testResult { return "Connection Successful" }
         return "Connection Failed"
     }
 
+    /// The message body for the connection test result alert.
     private var testResultMessage: String {
         switch testResult {
         case .success:        return "Successfully connected to the server."
@@ -121,12 +129,15 @@ struct AddServerView: View {
 
     // MARK: - Actions
 
+    /// Returns the server URL with a trailing slash appended if needed.
+    /// - Returns: The normalized URL string.
     private func normalizedURL() -> String {
         var s = url.trimmingCharacters(in: .whitespaces)
         if !s.hasSuffix("/") { s += "/" }
         return s
     }
 
+    /// Initiates an asynchronous connection test against the configured server using PROPFIND.
     private func testConnection() {
         isTesting = true
         let server = WebDAVServer(
@@ -153,6 +164,7 @@ struct AddServerView: View {
         }
     }
 
+    /// Validates and saves the server configuration, then dismisses the view.
     private func saveServer() {
         let urlString = normalizedURL()
         guard URL(string: urlString) != nil else { return }
@@ -176,8 +188,11 @@ struct AddServerView: View {
 
 // MARK: - TestResult
 
+/// Represents the outcome of a WebDAV connection test.
 private enum TestResult {
+    /// The connection test succeeded.
     case success
+    /// The connection test failed with the given error message.
     case failure(String)
 }
 

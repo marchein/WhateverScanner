@@ -1,5 +1,7 @@
 import SwiftUI
 
+/// Settings screen allowing users to configure scan behaviour, upload preferences,
+/// and manage WebDAV server connections.
 struct SettingsView: View {
     @EnvironmentObject var settings: AppSettings
     @Environment(\.dismiss) private var dismiss
@@ -75,6 +77,9 @@ struct SettingsView: View {
 
     // MARK: - Server Row
 
+    /// Builds a row for a single server, showing its name, URL, default status, and an edit button.
+    /// - Parameter server: The WebDAV server to display.
+    /// - Returns: A view representing the server row.
     @ViewBuilder
     private func serverRow(_ server: WebDAVServer) -> some View {
         HStack {
@@ -98,7 +103,7 @@ struct SettingsView: View {
                 serverToEdit = server
             } label: {
                 Image(systemName: "pencil")
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(Color.accentColor)
             }
             .buttonStyle(.plain)
             .padding(.leading, 8)

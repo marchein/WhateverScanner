@@ -2,10 +2,15 @@ import Foundation
 
 // MARK: - Errors
 
+/// Errors that can occur during WebDAV operations.
 enum WebDAVError: LocalizedError {
+    /// The server URL could not be parsed.
     case invalidURL
+    /// The server rejected the provided credentials.
     case authenticationFailed
+    /// The server responded with an unexpected HTTP status code.
     case serverError(Int)
+    /// A network-level error occurred.
     case networkError(Error)
 
     var errorDescription: String? {
@@ -24,7 +29,10 @@ enum WebDAVError: LocalizedError {
 
 // MARK: - Service
 
+/// Thread-safe actor responsible for communicating with WebDAV servers.
+/// Handles file uploads via HTTP PUT and connection testing via PROPFIND.
 actor WebDAVService {
+    /// Shared singleton instance.
     static let shared = WebDAVService()
 
     private let session: URLSession
@@ -36,7 +44,12 @@ actor WebDAVService {
         self.session = URLSession(configuration: config)
     }
 
-    /// Upload PDF data to a WebDAV server using HTTP PUT.
+    /// Uploads PDF data to a WebDAV server using HTTP PUT.
+    /// - Parameters:
+    ///   - data: The PDF file data to upload.
+    ///   - filename: The destination filename on the server.
+    ///   - server: The target WebDAV server configuration.
+    /// - Throws: `WebDAVError` if the URL is invalid or the server returns an error.
     func upload(data: Data, filename: String, to server: WebDAVServer) async throws {
         let urlString = server.url + filename
         guard let url = URL(string: urlString) else {
@@ -53,7 +66,9 @@ actor WebDAVService {
         try validate(response: response)
     }
 
-    /// Test connectivity and authentication via WebDAV PROPFIND.
+    /// Tests connectivity and authentication against a WebDAV server using a PROPFIND request.
+    /// - Parameter server: The server configuration to test.
+    /// - Throws: `WebDAVError` if the URL is invalid, authentication fails, or a network error occurs.
     func testConnection(to server: WebDAVServer) async throws {
         guard let url = URL(string: server.url) else {
             throw WebDAVError.invalidURL
@@ -78,6 +93,9 @@ actor WebDAVService {
 
     // MARK: - Helpers
 
+    /// Validates an HTTP response, throwing appropriate errors for non-success status codes.
+    /// - Parameter response: The URL response to validate.
+    /// - Throws: `WebDAVError.authenticationFailed` for 401, `WebDAVError.serverError` for other failures.
     private func validate(response: URLResponse) throws {
         guard let http = response as? HTTPURLResponse else {
             throw WebDAVError.serverError(0)
@@ -92,6 +110,11 @@ actor WebDAVService {
         }
     }
 
+    /// Creates a Basic Authentication header value from the given credentials.
+    /// - Parameters:
+    ///   - username: The authentication username.
+    ///   - password: The authentication password.
+    /// - Returns: A `Basic` authorization header string.
     private func basicAuthHeader(username: String, password: String) -> String {
         let credentials = "\(username):\(password)"
         guard let data = credentials.data(using: .utf8) else { return "" }

@@ -1,6 +1,8 @@
 import SwiftUI
 import VisionKit
 
+/// The primary view of the app, displaying the scan button and upload status.
+/// Handles document scanning via VisionKit and uploading scanned PDFs to configured WebDAV servers.
 struct MainView: View {
     @EnvironmentObject var settings: AppSettings
 
@@ -19,7 +21,7 @@ struct MainView: View {
 
                 Image(systemName: "doc.text.viewfinder")
                     .font(.system(size: 80))
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(Color.accentColor)
 
                 Text("Ready to Scan")
                     .font(.largeTitle.bold())
@@ -81,6 +83,7 @@ struct MainView: View {
 
     // MARK: - Sub-views
 
+    /// Displays the current upload destination based on user settings.
     @ViewBuilder
     private var uploadDestinationLabel: some View {
         if settings.servers.isEmpty {
@@ -98,12 +101,14 @@ struct MainView: View {
 
     // MARK: - Alert Helpers
 
+    /// The title string for the upload result alert.
     private var uploadAlertTitle: String {
         guard let status = uploadStatus else { return "" }
         if case .success = status { return "Upload Successful" }
         return "Upload Failed"
     }
 
+    /// The message body for the upload result alert.
     private var uploadAlertMessage: String {
         switch uploadStatus {
         case .success(let count):
@@ -117,6 +122,8 @@ struct MainView: View {
 
     // MARK: - Scan Handling
 
+    /// Processes the result from the document camera, initiating upload on success.
+    /// - Parameter result: The scan result containing either a `VNDocumentCameraScan` or an error.
     private func handleScanResult(_ result: Result<VNDocumentCameraScan, Error>) {
         switch result {
         case .success(let scan):
@@ -128,6 +135,8 @@ struct MainView: View {
         }
     }
 
+    /// Converts the scanned pages to a PDF and uploads it to the configured server(s).
+    /// - Parameter scan: The document camera scan containing one or more pages.
     @MainActor
     private func uploadScan(_ scan: VNDocumentCameraScan) async {
         isUploading = true
@@ -172,8 +181,11 @@ struct MainView: View {
 
 // MARK: - UploadStatus
 
+/// Represents the outcome of a document upload operation.
 private enum UploadStatus {
+    /// Upload succeeded to the given number of servers.
     case success(Int)
+    /// Upload failed with the given error message.
     case failure(String)
 }
 

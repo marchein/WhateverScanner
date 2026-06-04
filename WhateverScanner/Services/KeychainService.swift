@@ -4,9 +4,14 @@ import Security
 /// Thin wrapper around the iOS Keychain for storing per-server passwords.
 enum KeychainService {
 
+    /// The Keychain service identifier used for all password entries.
     private static let service = "com.marchein.WhateverScanner"
 
-    /// Save or update a password for the given key.
+    /// Saves or updates a password in the Keychain for the given key.
+    /// - Parameters:
+    ///   - password: The password string to store.
+    ///   - key: The unique key to associate with the password (typically a server's UUID string).
+    /// - Throws: `KeychainError.saveFailed` if the Keychain operation fails.
     static func save(password: String, forKey key: String) throws {
         guard let data = password.data(using: .utf8) else { return }
 
@@ -35,7 +40,9 @@ enum KeychainService {
         }
     }
 
-    /// Retrieve the password for the given key, or `nil` if not found.
+    /// Retrieves the password for the given key from the Keychain.
+    /// - Parameter key: The key to look up (typically a server's UUID string).
+    /// - Returns: The stored password string, or `nil` if no entry was found.
     static func retrieve(forKey key: String) -> String? {
         let query: [CFString: Any] = [
             kSecClass:            kSecClassGenericPassword,
@@ -54,7 +61,8 @@ enum KeychainService {
         return password
     }
 
-    /// Delete the password for the given key.
+    /// Deletes the password for the given key from the Keychain.
+    /// - Parameter key: The key whose entry should be removed.
     static func delete(forKey key: String) {
         let query: [CFString: Any] = [
             kSecClass:       kSecClassGenericPassword,
@@ -66,7 +74,9 @@ enum KeychainService {
 
     // MARK: - Error
 
+    /// Errors that can occur during Keychain operations.
     enum KeychainError: Error, LocalizedError {
+        /// A save or update operation failed with the given OS status code.
         case saveFailed(OSStatus)
 
         var errorDescription: String? {

@@ -12,6 +12,13 @@ struct WebDAVServer: Identifiable, Equatable {
     /// Loaded from the Keychain at runtime; never written to UserDefaults.
     var password: String
 
+    /// Creates a new WebDAV server configuration.
+    /// - Parameters:
+    ///   - id: Unique identifier for the server. Defaults to a new UUID.
+    ///   - name: A user-facing display name.
+    ///   - url: The WebDAV endpoint URL.
+    ///   - username: The authentication username.
+    ///   - password: The authentication password (stored in Keychain, not in JSON).
     init(id: UUID = UUID(), name: String, url: String, username: String, password: String) {
         self.id = id
         self.name = name
@@ -29,6 +36,8 @@ extension WebDAVServer: Codable {
         case id, name, url, username
     }
 
+    /// Decodes a server from JSON. The password field is intentionally excluded and set to empty;
+    /// it is restored from the Keychain by `AppSettings`.
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         id       = try c.decode(UUID.self,   forKey: .id)
@@ -38,6 +47,7 @@ extension WebDAVServer: Codable {
         password = "" // Restored from Keychain by AppSettings
     }
 
+    /// Encodes the server to JSON, deliberately omitting the password.
     func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encode(id,       forKey: .id)

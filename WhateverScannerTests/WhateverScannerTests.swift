@@ -1,6 +1,8 @@
 import XCTest
 @testable import WhateverScanner
 
+/// Unit tests for the WhateverScanner app covering WebDAV server model,
+/// app settings server management, upload targets, and PDF service functionality.
 final class WhateverScannerTests: XCTestCase {
 
     // MARK: - WebDAVServer

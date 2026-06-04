@@ -1,5 +1,7 @@
 import SwiftUI
 
+/// Onboarding flow shown on first launch. Guides the user through a welcome screen
+/// and initial WebDAV server setup before entering the main application.
 struct OnboardingView: View {
     @EnvironmentObject var settings: AppSettings
 
@@ -30,13 +32,14 @@ struct OnboardingView: View {
 
     // MARK: - Pages
 
+    /// The initial welcome page introducing the app and its purpose.
     private var welcomePage: some View {
         VStack(spacing: 24) {
             Spacer()
 
             Image(systemName: "doc.text.viewfinder")
                 .font(.system(size: 80))
-                .foregroundStyle(.accent)
+                .foregroundStyle(Color.accentColor)
 
             Text("WhateverScanner")
                 .font(.largeTitle.bold())
@@ -59,12 +62,13 @@ struct OnboardingView: View {
         .padding()
     }
 
+    /// The server configuration page where the user enters WebDAV credentials.
     private var serverSetupPage: some View {
         ScrollView {
             VStack(spacing: 24) {
                 Image(systemName: "server.rack")
                     .font(.system(size: 60))
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(Color.accentColor)
                     .padding(.top, 20)
 
                 Text("Set Up Your Server")
@@ -115,6 +119,12 @@ struct OnboardingView: View {
 
     // MARK: - Helpers
 
+    /// Creates a labeled text field row for the server setup form.
+    /// - Parameters:
+    ///   - label: The label displayed alongside the text field.
+    ///   - placeholder: Placeholder text shown when the field is empty.
+    ///   - text: A binding to the text value entered by the user.
+    /// - Returns: A view containing the labeled text field.
     @ViewBuilder
     private func serverField(label: String, placeholder: String, text: Binding<String>) -> some View {
         LabeledContent(label) {
@@ -124,6 +134,7 @@ struct OnboardingView: View {
         .padding()
     }
 
+    /// Whether all required server fields have been filled in by the user.
     private var isFormValid: Bool {
         !serverName.trimmingCharacters(in: .whitespaces).isEmpty &&
         !serverURL.trimmingCharacters(in: .whitespaces).isEmpty &&
@@ -131,6 +142,7 @@ struct OnboardingView: View {
         !password.isEmpty
     }
 
+    /// Validates the form input and saves the new server to app settings, then completes setup.
     private func saveServer() {
         var urlString = serverURL.trimmingCharacters(in: .whitespaces)
         if !urlString.hasSuffix("/") { urlString += "/" }
