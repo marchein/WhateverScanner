@@ -64,9 +64,39 @@
     "Document uploaded to %lld server(s)." : {
       "localizations" : {
         "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dokument auf %lld Server hochgeladen."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Dokument auf %lld Server hochgeladen."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Dokument auf %lld Server hochgeladen."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Document uploaded to %lld server."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Document uploaded to %lld servers."
+                }
+              }
+            }
           }
         }
       }
@@ -130,6 +160,9 @@
           }
         }
       }
+    },
+    "https://cloud.example.com/remote.php/dav/files/user/" : {
+      "shouldTranslate" : false
     },
     "My Nextcloud" : {
       "localizations" : {
@@ -236,7 +269,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dokumente scannen und direkt auf deinen WebDAV-Server hochladen — z.\u00A0B. Nextcloud."
+            "value" : "Dokumente scannen und direkt auf deinen WebDAV-Server hochladen — z. B. Nextcloud."
           }
         }
       }
@@ -257,16 +290,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Serverdetails"
-          }
-        }
-      }
-    },
-    "Server URL" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Server-URL"
           }
         }
       }
@@ -351,22 +374,22 @@
         }
       }
     },
-    "Upload failed:" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hochladen fehlgeschlagen:"
-          }
-        }
-      }
-    },
     "Upload Failed" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Upload fehlgeschlagen"
+          }
+        }
+      }
+    },
+    "Upload failed:" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hochladen fehlgeschlagen:"
           }
         }
       }
@@ -394,9 +417,39 @@
     "Uploaded to %lld server(s), but failed:" : {
       "localizations" : {
         "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auf %lld Server hochgeladen, aber fehlgeschlagen:"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Auf %lld Server hochgeladen, aber fehlgeschlagen:"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Auf %lld Server hochgeladen, aber fehlgeschlagen:"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Uploaded to %lld server, but failed:"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Uploaded to %lld servers, but failed:"
+                }
+              }
+            }
           }
         }
       }
@@ -460,6 +513,9 @@
           }
         }
       }
+    },
+    "WhateverScanner" : {
+      "shouldTranslate" : false
     },
     "When disabled, scans are uploaded to the selected default server only." : {
       "localizations" : {
