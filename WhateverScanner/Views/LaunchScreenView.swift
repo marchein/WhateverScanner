@@ -7,7 +7,7 @@ struct LaunchScreenView: View {
         VStack(spacing: 16) {
             Image(systemName: "document.viewfinder.fill")
                 .font(.system(size: 80))
-                .foregroundStyle(.accent)
+                .foregroundStyle(Color.accentColor)
             Text("WhateverScanner")
                 .font(.title)
                 .fontWeight(.bold)
