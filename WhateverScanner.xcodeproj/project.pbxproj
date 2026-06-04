@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5B6437A72FD20BFA00A0EFD1 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 5B6437A62FD20BFA00A0EFD1 /* AppIcon.icon */; };
 		AABBCCDD00000201AABBCCDD /* WhateverScannerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABBCCDD00000101AABBCCDD /* WhateverScannerApp.swift */; };
 		AABBCCDD00000202AABBCCDD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABBCCDD00000102AABBCCDD /* ContentView.swift */; };
 		AABBCCDD00000204AABBCCDD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AABBCCDD00000104AABBCCDD /* Assets.xcassets */; };
@@ -37,6 +38,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5B6437A62FD20BFA00A0EFD1 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		AABBCCDD00000004AABBCCDD /* WhateverScanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WhateverScanner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AABBCCDD00000005AABBCCDD /* WhateverScannerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WhateverScannerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AABBCCDD00000101AABBCCDD /* WhateverScannerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhateverScannerApp.swift; sourceTree = "<group>"; };
@@ -95,6 +97,7 @@
 				AABBCCDD00000304AABBCCDD /* Views */,
 				AABBCCDD00000305AABBCCDD /* Services */,
 				AABBCCDD00000104AABBCCDD /* Assets.xcassets */,
+				5B6437A62FD20BFA00A0EFD1 /* AppIcon.icon */,
 				AABBCCDD00000116AABBCCDD /* Localizable.xcstrings */,
 				AABBCCDD00000103AABBCCDD /* Info.plist */,
 			);
@@ -234,6 +237,7 @@
 			files = (
 				AABBCCDD00000204AABBCCDD /* Assets.xcassets in Resources */,
 				AABBCCDD00000216AABBCCDD /* Localizable.xcstrings in Resources */,
+				5B6437A72FD20BFA00A0EFD1 /* AppIcon.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,6 +289,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -302,6 +307,10 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "de.marc-hein.whateverscanner";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -313,6 +322,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -330,6 +340,10 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "de.marc-hein.whateverscanner";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
