@@ -25,6 +25,7 @@
 		AABBCCDD00000216AABBCCDD /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = AABBCCDD00000116AABBCCDD /* Localizable.xcstrings */; };
 		AABBCCDD00000217AABBCCDD /* OCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABBCCDD00000117AABBCCDD /* OCRService.swift */; };
 		AABBCCDD00000218AABBCCDD /* ScanPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABBCCDD00000118AABBCCDD /* ScanPreviewView.swift */; };
+		AABBCCDD00000219AABBCCDD /* LaunchScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABBCCDD00000119AABBCCDD /* LaunchScreenView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +60,7 @@
 		AABBCCDD00000116AABBCCDD /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		AABBCCDD00000117AABBCCDD /* OCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRService.swift; sourceTree = "<group>"; };
 		AABBCCDD00000118AABBCCDD /* ScanPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanPreviewView.swift; sourceTree = "<group>"; };
+		AABBCCDD00000119AABBCCDD /* LaunchScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreenView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,6 +123,7 @@
 				AABBCCDD00000109AABBCCDD /* ScannerView.swift */,
 				AABBCCDD00000110AABBCCDD /* SettingsView.swift */,
 				AABBCCDD00000111AABBCCDD /* AddServerView.swift */,
+				AABBCCDD00000119AABBCCDD /* LaunchScreenView.swift */,
 				AABBCCDD00000118AABBCCDD /* ScanPreviewView.swift */,
 			);
 			path = Views;
@@ -199,7 +202,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1600;
-				LastUpgradeCheck = 1600;
+				LastUpgradeCheck = 2650;
 				TargetAttributes = {
 					AABBCCDD00000002AABBCCDD = {
 						CreatedOnToolsVersion = 16.0;
@@ -257,6 +260,7 @@
 				AABBCCDD00000209AABBCCDD /* ScannerView.swift in Sources */,
 				AABBCCDD00000210AABBCCDD /* SettingsView.swift in Sources */,
 				AABBCCDD00000211AABBCCDD /* AddServerView.swift in Sources */,
+				AABBCCDD00000219AABBCCDD /* LaunchScreenView.swift in Sources */,
 				AABBCCDD00000212AABBCCDD /* WebDAVService.swift in Sources */,
 				AABBCCDD00000213AABBCCDD /* PDFService.swift in Sources */,
 				AABBCCDD00000215AABBCCDD /* KeychainService.swift in Sources */,
@@ -355,6 +359,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -374,6 +379,7 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_CYCLE = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
@@ -408,6 +414,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -418,6 +425,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -437,6 +445,7 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_CYCLE = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
@@ -463,6 +472,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
