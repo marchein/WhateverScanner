@@ -21,6 +21,7 @@
 		AABBCCDD00000213AABBCCDD /* PDFService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABBCCDD00000113AABBCCDD /* PDFService.swift */; };
 		AABBCCDD00000214AABBCCDD /* WhateverScannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABBCCDD00000114AABBCCDD /* WhateverScannerTests.swift */; };
 		AABBCCDD00000215AABBCCDD /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABBCCDD00000115AABBCCDD /* KeychainService.swift */; };
+		AABBCCDD00000216AABBCCDD /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = AABBCCDD00000116AABBCCDD /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +52,7 @@
 		AABBCCDD00000113AABBCCDD /* PDFService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFService.swift; sourceTree = "<group>"; };
 		AABBCCDD00000114AABBCCDD /* WhateverScannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhateverScannerTests.swift; sourceTree = "<group>"; };
 		AABBCCDD00000115AABBCCDD /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
+		AABBCCDD00000116AABBCCDD /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +91,7 @@
 				AABBCCDD00000304AABBCCDD /* Views */,
 				AABBCCDD00000305AABBCCDD /* Services */,
 				AABBCCDD00000104AABBCCDD /* Assets.xcassets */,
+				AABBCCDD00000116AABBCCDD /* Localizable.xcstrings */,
 				AABBCCDD00000103AABBCCDD /* Info.plist */,
 			);
 			path = WhateverScanner;
@@ -205,6 +208,7 @@
 			knownRegions = (
 				en,
 				Base,
+				de,
 			);
 			mainGroup = AABBCCDD00000301AABBCCDD;
 			productRefGroup = AABBCCDD00000306AABBCCDD /* Products */;
@@ -223,6 +227,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AABBCCDD00000204AABBCCDD /* Assets.xcassets in Resources */,
+				AABBCCDD00000216AABBCCDD /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

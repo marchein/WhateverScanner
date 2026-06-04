@@ -104,15 +104,15 @@ struct MainView: View {
     /// The title string for the upload result alert.
     private var uploadAlertTitle: String {
         guard let status = uploadStatus else { return "" }
-        if case .success = status { return "Upload Successful" }
-        return "Upload Failed"
+        if case .success = status { return String(localized: "Upload Successful") }
+        return String(localized: "Upload Failed")
     }
 
     /// The message body for the upload result alert.
     private var uploadAlertMessage: String {
         switch uploadStatus {
         case .success(let count):
-            return "Document uploaded to \(count) server\(count == 1 ? "" : "s")."
+            return String(localized: "Document uploaded to \(count) server(s).")
         case .failure(let message):
             return message
         case nil:
@@ -130,7 +130,7 @@ struct MainView: View {
             guard scan.pageCount > 0 else { return }
             Task { await uploadScan(scan) }
         case .failure(let error):
-            uploadStatus = .failure("Scan failed: \(error.localizedDescription)")
+            uploadStatus = .failure(String(localized: "Scan failed: \(error.localizedDescription)"))
             showUploadResult = true
         }
     }
@@ -145,7 +145,7 @@ struct MainView: View {
 
         guard let pdfData = PDFService.shared.createPDF(from: images) else {
             isUploading = false
-            uploadStatus = .failure("Failed to create PDF from the scanned pages.")
+            uploadStatus = .failure(String(localized: "Failed to create PDF from the scanned pages."))
             showUploadResult = true
             return
         }
@@ -169,11 +169,13 @@ struct MainView: View {
         if errors.isEmpty {
             uploadStatus = .success(successCount)
         } else if successCount > 0 {
+            let errorSummary = errors.joined(separator: "\n")
             uploadStatus = .failure(
-                "Uploaded to \(successCount) server(s), but failed:\n\(errors.joined(separator: "\n"))"
+                String(localized: "Uploaded to \(successCount) server(s), but failed:") + "\n" + errorSummary
             )
         } else {
-            uploadStatus = .failure("Upload failed:\n\(errors.joined(separator: "\n"))")
+            let errorSummary = errors.joined(separator: "\n")
+            uploadStatus = .failure(String(localized: "Upload failed:") + "\n" + errorSummary)
         }
         showUploadResult = true
     }
