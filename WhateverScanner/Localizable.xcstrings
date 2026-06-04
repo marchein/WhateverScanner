@@ -11,6 +11,16 @@
         }
       }
     },
+    "Analyzing…" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird analysiert…"
+          }
+        }
+      }
+    },
     "Auto-Start Scanner on Launch" : {
       "localizations" : {
         "de" : {
@@ -41,6 +51,16 @@
         }
       }
     },
+    "Date" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datum"
+          }
+        }
+      }
+    },
     "Connection Successful" : {
       "localizations" : {
         "de" : {
@@ -57,6 +77,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Standardserver"
+          }
+        }
+      }
+    },
+    "Document Date" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dokumentdatum"
+          }
+        }
+      }
+    },
+    "Document Name" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dokumentname"
           }
         }
       }
@@ -107,6 +147,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fertig"
+          }
+        }
+      }
+    },
+    "Edit Details" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Details bearbeiten"
           }
         }
       }
@@ -254,12 +304,32 @@
         }
       }
     },
+    "Scan Date" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan-Datum"
+          }
+        }
+      }
+    },
     "Scan Document" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dokument scannen"
+          }
+        }
+      }
+    },
+    "Scan Error" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan-Fehler"
           }
         }
       }
