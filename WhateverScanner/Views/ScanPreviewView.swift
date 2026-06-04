@@ -51,10 +51,8 @@ struct ScanPreviewView: View {
                     if isUploading {
                         ProgressView()
                     } else {
-                        Button {
+                        Button(String(localized: "Upload")) {
                             Task { await upload() }
-                        } label: {
-                            Label(String(localized: "Upload"), systemImage: "square.and.arrow.up")
                         }
                         .buttonStyle(.borderedProminent)
                     }

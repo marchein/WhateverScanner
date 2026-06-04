@@ -51,22 +51,22 @@
         }
       }
     },
-    "Date" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Datum"
-          }
-        }
-      }
-    },
     "Connection Successful" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Verbindung erfolgreich"
+          }
+        }
+      }
+    },
+    "Date" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datum"
           }
         }
       }
@@ -324,22 +324,22 @@
         }
       }
     },
-    "Scan Error" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scan-Fehler"
-          }
-        }
-      }
-    },
     "Scan documents and upload them directly to your WebDAV server — e.g. Nextcloud." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dokumente scannen und direkt auf deinen WebDAV-Server hochladen — z. B. Nextcloud."
+          }
+        }
+      }
+    },
+    "Scan Error" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan-Fehler"
           }
         }
       }
@@ -545,6 +545,7 @@
       }
     },
     "Uploading…" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
