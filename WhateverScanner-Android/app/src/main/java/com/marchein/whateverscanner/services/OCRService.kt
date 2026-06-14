@@ -29,7 +29,9 @@ class OCRService @Inject constructor() {
         val documentDate: Date?
     )
 
-    private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+    private val recognizer by lazy {
+        TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+    }
 
     /**
      * Runs OCR on the first page of [images] and extracts document metadata.
