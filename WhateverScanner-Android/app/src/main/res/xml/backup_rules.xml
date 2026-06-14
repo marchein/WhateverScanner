@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Encrypted credentials live in EncryptedSharedPreferences and must not
+         be included in cloud backups, as the Keystore master key is device-bound. -->
+    <exclude domain="sharedpref" path="whateverscanner_secure_prefs.xml" />
+</full-backup-content>

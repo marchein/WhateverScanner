@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Base application theme. The Compose UI applies its own Material 3 theme,
+         so this only needs to be a non-action-bar Material theme. -->
+    <style name="Theme.WhateverScanner" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- Splash screen theme used while the app process starts (Android 12+ API). -->
+    <style name="Theme.WhateverScanner.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_scanner</item>
+        <item name="postSplashScreenTheme">@style/Theme.WhateverScanner</item>
+    </style>
+
+</resources>
