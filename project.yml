@@ -1,0 +1,132 @@
+# XcodeGen project configuration for WhateverScanner
+# This file defines the project structure, targets, and build settings
+# Language: English
+
+# Project-wide variables - Modify these values to update version and build information
+variables:
+  VERSION: "1.0"              # Application version number (semantic versioning)
+  BUILD_NUMBER: "1"           # Build number for tracking releases
+
+# Project name
+name: WhateverScanner
+
+# Project-wide settings
+settings:
+  DEVELOPMENT_TEAM: UJR28ZV94C
+  CODE_SIGN_STYLE: Automatic
+
+# Swift Package dependencies
+packages:
+  AMSMB2:
+    url: https://github.com/amosavian/AMSMB2
+    from: 4.0.0
+
+# Define all targets
+targets:
+  # Main application target
+  WhateverScanner:
+    type: application
+    platform: iOS
+    deploymentTarget: "18.6"
+    
+    # Source files configuration - includes all Swift files from subdirectories
+    sources:
+      - path: WhateverScanner
+        includes:
+          - "**/*.swift"
+        excludes:
+          - "**/*Tests.swift"
+          - "**/*Test.swift"
+      # XcodeGen silently drops these when listed under `resources` if the
+      # `WhateverScanner` source path above is also present — list them as
+      # separate `sources` entries instead so they end up in the Resources
+      # build phase (verified against xcodegen 2.46.0).
+      - path: WhateverScanner/AppIcon.icon
+      - path: WhateverScanner/Assets.xcassets
+      - path: WhateverScanner/Localizable.xcstrings
+
+    # Swift Package Manager dependencies
+    dependencies:
+      - package: AMSMB2
+        embed: true
+
+    # Build settings specific to this target
+    settings:
+      ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+      ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+      ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS: "NO"
+      CURRENT_PROJECT_VERSION: ${BUILD_NUMBER}
+      DEVELOPMENT_ASSET_PATHS: ""
+      ENABLE_PREVIEWS: "YES"
+      GENERATE_INFOPLIST_FILE: "NO"
+      INFOPLIST_FILE: WhateverScanner/Info.plist
+      INFOPLIST_KEY_CFBundleDisplayName: WhateverScanner
+      INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
+      IPHONEOS_DEPLOYMENT_TARGET: "18.6"
+      MARKETING_VERSION: ${VERSION}
+      PRODUCT_BUNDLE_IDENTIFIER: de.marc-hein.whateverscanner
+      SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"
+      SUPPORTS_MACCATALYST: "NO"
+      SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: "NO"
+      SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: "NO"
+      SWIFT_EMIT_LOC_STRINGS: "YES"
+      SWIFT_VERSION: "5.0"
+      TARGETED_DEVICE_FAMILY: "1,2"
+
+  # Unit tests target
+  WhateverScannerTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "18.6"
+    
+    # Test source files - includes all Swift files from test directory
+    sources:
+      - path: WhateverScannerTests
+        includes:
+          - "**/*.swift"
+    
+    # Link this test target to the main app
+    dependencies:
+      - target: WhateverScanner
+    
+    # Test target build settings
+    settings:
+      BUNDLE_LOADER: $(TEST_HOST)
+      CODE_SIGN_STYLE: Automatic
+      CURRENT_PROJECT_VERSION: ${BUILD_NUMBER}
+      DEVELOPMENT_TEAM: UJR28ZV94C
+      GENERATE_INFOPLIST_FILE: "YES"
+      IPHONEOS_DEPLOYMENT_TARGET: "18.6"
+      MARKETING_VERSION: ${VERSION}
+      PRODUCT_BUNDLE_IDENTIFIER: de.marc-hein.whateverscanner.tests
+      SWIFT_EMIT_LOC_STRINGS: "NO"
+      SWIFT_VERSION: "5.0"
+      TARGETED_DEVICE_FAMILY: "1"
+      TEST_HOST: $(BUILT_PRODUCTS_DIR)/WhateverScanner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WhateverScanner
+
+# Global build configurations
+configurations:
+  Debug:
+    settings:
+      DEBUG_INFORMATION_FORMAT: dwarf
+      GCC_OPTIMIZATION_LEVEL: "0"
+      ONLY_ACTIVE_ARCH: "YES"
+      SWIFT_ACTIVE_COMPILATION_CONDITIONS: "DEBUG $(inherited)"
+      SWIFT_OPTIMIZATION_LEVEL: "-Onone"
+      ENABLE_TESTABILITY: "YES"
+      MTL_ENABLE_DEBUG_INFO: INCLUDE_SOURCE
+  
+  Release:
+    settings:
+      DEBUG_INFORMATION_FORMAT: dwarf-with-dsym
+      ENABLE_NS_ASSERTIONS: "NO"
+      SWIFT_COMPILATION_MODE: wholemodule
+      VALIDATE_PRODUCT: "YES"
+
+# Project options
+options:
+  knownRegions:
+    - en
+    - de
+    - Base
+  minimumXcodeGenVersion: "2.35"

@@ -16,6 +16,12 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>NSCameraUsageDescription</key>
 	<string>WhateverScanner uses the camera to scan documents.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>WhateverScanner can save scanned documents as images to your photo library.</string>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

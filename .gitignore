@@ -33,3 +33,5 @@ Carthage/Build/
 
 # SPM resolved
 Package.resolved
+/WhateverScanner.xcodeproj
+/WhateverScanner.xcodeproj
