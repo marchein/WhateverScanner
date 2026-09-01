@@ -11,9 +11,11 @@ xcodegen generate
 
 # Xcode Cloud's own "Resolve Package Graph" build step runs with automatic
 # package resolution disabled and requires a Package.resolved to already
-# exist at project.xcworkspace/xcshareddata/swiftpm/. Since the workspace is
-# freshly generated above (with no resolved file yet), resolve it here first
-# so that later step finds an up-to-date Package.resolved in place.
-xcodebuild -resolvePackageDependencies \
-  -project WhateverScanner.xcodeproj \
-  -scheme WhateverScanner
+# exist at project.xcworkspace/xcshareddata/swiftpm/ — and that restriction
+# also applies to `xcodebuild -resolvePackageDependencies` run here, so it
+# can't be used to generate the file live. Instead, restore the committed
+# template (kept in sync with project.yml's `packages:` section; its
+# originHash is stable across regenerations as long as those don't change).
+SWIFTPM_DIR="WhateverScanner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm"
+mkdir -p "$SWIFTPM_DIR"
+cp ci_scripts/Package.resolved "$SWIFTPM_DIR/Package.resolved"

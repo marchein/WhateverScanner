@@ -111,6 +111,26 @@ an [Xcode Cloud post-clone script](https://developer.apple.com/documentation/xco
 that installs XcodeGen via Homebrew and runs `xcodegen generate` against the
 freshly cloned repository before Xcode Cloud resolves/builds the project.
 
+Xcode Cloud's own package-resolution step runs with automatic dependency
+resolution disabled and requires a `Package.resolved` to already exist —
+but the workspace is freshly generated on every run, so there's nothing to
+find yet, and even invoking `xcodebuild -resolvePackageDependencies`
+ourselves in the script is blocked by that same restriction. Instead,
+[ci_scripts/Package.resolved](ci_scripts/Package.resolved) is committed as a
+template and the post-clone script copies it into the generated workspace's
+`project.xcworkspace/xcshareddata/swiftpm/` folder. Its `originHash` is
+derived from the package requirements declared in `project.yml` and stays
+stable as long as those don't change, so it survives being regenerated.
+
+> **Whenever you add, remove, or bump a version of a package** in
+> `project.yml`'s `packages:` section, regenerate this template locally and
+> commit the update:
+> ```sh
+> xcodegen generate
+> xcodebuild -resolvePackageDependencies -project WhateverScanner.xcodeproj -scheme WhateverScanner
+> cp WhateverScanner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved ci_scripts/Package.resolved
+> ```
+
 ## Building from the Command Line
 
 ```sh

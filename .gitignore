@@ -33,5 +33,8 @@ Carthage/Build/
 
 # SPM resolved
 Package.resolved
+# ...except the committed template Xcode Cloud restores into place
+# (see ci_scripts/ci_post_clone.sh)
+!/ci_scripts/Package.resolved
 /WhateverScanner.xcodeproj
 /WhateverScanner.xcodeproj
