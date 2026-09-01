@@ -2,18 +2,21 @@
 # This file defines the project structure, targets, and build settings
 # Language: English
 
-# Project-wide variables - Modify these values to update version and build information
-variables:
-  VERSION: "1.0"              # Application version number (semantic versioning)
-  BUILD_NUMBER: "1"           # Build number for tracking releases
-
 # Project name
 name: WhateverScanner
 
 # Project-wide settings
+# NOTE: `${VAR}` substitution in XcodeGen only pulls from real shell
+# environment variables (see `xcodegen --help` / `-n, --no-env`), NOT from a
+# yaml `variables:` key (that isn't part of the XcodeGen spec and is silently
+# ignored). MARKETING_VERSION/CURRENT_PROJECT_VERSION are hardcoded here, in
+# one place, applying to every target below — bump them here to release a
+# new version/build.
 settings:
   DEVELOPMENT_TEAM: UJR28ZV94C
   CODE_SIGN_STYLE: Automatic
+  MARKETING_VERSION: "1.0"
+  CURRENT_PROJECT_VERSION: "1"
 
 # Swift Package dependencies
 packages:
@@ -55,7 +58,6 @@ targets:
       ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
       ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
       ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS: "NO"
-      CURRENT_PROJECT_VERSION: ${BUILD_NUMBER}
       DEVELOPMENT_ASSET_PATHS: ""
       ENABLE_PREVIEWS: "YES"
       GENERATE_INFOPLIST_FILE: "NO"
@@ -63,7 +65,6 @@ targets:
       INFOPLIST_KEY_CFBundleDisplayName: WhateverScanner
       INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
       IPHONEOS_DEPLOYMENT_TARGET: "18.6"
-      MARKETING_VERSION: ${VERSION}
       PRODUCT_BUNDLE_IDENTIFIER: de.marc-hein.whateverscanner
       SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"
       SUPPORTS_MACCATALYST: "NO"
@@ -93,11 +94,9 @@ targets:
     settings:
       BUNDLE_LOADER: $(TEST_HOST)
       CODE_SIGN_STYLE: Automatic
-      CURRENT_PROJECT_VERSION: ${BUILD_NUMBER}
       DEVELOPMENT_TEAM: UJR28ZV94C
       GENERATE_INFOPLIST_FILE: "YES"
       IPHONEOS_DEPLOYMENT_TARGET: "18.6"
-      MARKETING_VERSION: ${VERSION}
       PRODUCT_BUNDLE_IDENTIFIER: de.marc-hein.whateverscanner.tests
       SWIFT_EMIT_LOC_STRINGS: "NO"
       SWIFT_VERSION: "5.0"

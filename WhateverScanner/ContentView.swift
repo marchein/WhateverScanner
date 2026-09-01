@@ -10,6 +10,7 @@ struct ContentView: View {
     var body: some View {
         if showLaunchScreen {
             LaunchScreenView()
+                .transition(.opacity)
                 .onAppear {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                         withAnimation {

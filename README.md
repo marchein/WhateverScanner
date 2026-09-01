@@ -87,6 +87,10 @@ WhateverScannerTests/        Unit tests (one file per Model/Service)
 > `xcodegen generate` before building — the `.xcodeproj` is not kept in sync
 > automatically, and files won't be picked up otherwise.
 
+`WhateverScanner.xcodeproj/` is a generated build artifact and is **git-ignored**,
+not committed — everyone (and every CI system) regenerates it locally from
+`project.yml` rather than relying on a potentially stale, committed copy.
+
 ## Configuration
 
 - **Signing** — the project uses automatic code signing
@@ -98,6 +102,14 @@ WhateverScannerTests/        Unit tests (one file per Model/Service)
 - **Dependencies** — Swift Package Manager dependencies are declared under the
   top-level `packages:` key in `project.yml` (currently just AMSMB2 for SMB
   support) and referenced per-target under `dependencies:`.
+
+## Xcode Cloud
+
+Since the `.xcodeproj` isn't committed, Xcode Cloud needs to generate it itself
+before every build. This is handled by [ci_scripts/ci_post_clone.sh](ci_scripts/ci_post_clone.sh),
+an [Xcode Cloud post-clone script](https://developer.apple.com/documentation/xcode/writing-custom-build-scripts)
+that installs XcodeGen via Homebrew and runs `xcodegen generate` against the
+freshly cloned repository before Xcode Cloud resolves/builds the project.
 
 ## Building from the Command Line
 
