@@ -1,6 +1,63 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@ (%@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ (%2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ (%2$@"
+          }
+        }
+      }
+    },
+    "%@/%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@/%2$@"
+          }
+        }
+      }
+    },
+    "192.168.1.10" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "192.168.1.10"
+          }
+        }
+      }
+    },
+    "Access to the selected folder was denied." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Zugriff auf den ausgewählten Ordner wurde verweigert."
+          }
+        }
+      }
+    },
+    "Add a server to start scanning and uploading documents." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Füge einen Server hinzu, um mit dem Scannen und Hochladen von Dokumenten zu beginnen."
+          }
+        }
+      }
+    },
     "Add Server" : {
       "localizations" : {
         "de" : {
@@ -10,6 +67,32 @@
           }
         }
       }
+    },
+    "Add SMB Server" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SMB-Server hinzufügen"
+          }
+        }
+      }
+    },
+    "Add WebDAV Server" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WebDAV-Server hinzufügen"
+          }
+        }
+      }
+    },
+    "All servers (%lld)" : {
+
+    },
+    "All SMB shares (%lld)" : {
+
     },
     "Analyzing…" : {
       "localizations" : {
@@ -21,12 +104,62 @@
         }
       }
     },
+    "Authentication failed. Check your username and password." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authentifizierung fehlgeschlagen. Überprüfe Benutzername und Passwort."
+          }
+        }
+      }
+    },
+    "Auto-Save" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatisches Speichern"
+          }
+        }
+      }
+    },
     "Auto-Start Scanner on Launch" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Scanner beim Start automatisch öffnen"
+          }
+        }
+      }
+    },
+    "Auto-Upload to SMB Server" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatisch auf SMB-Server hochladen"
+          }
+        }
+      }
+    },
+    "Auto-Upload to WebDAV Server" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatisch auf WebDAV-Server hochladen"
+          }
+        }
+      }
+    },
+    "Automatically save every scan as images to Photos and/or as a PDF to a folder in the Files app. If no folder is selected, PDFs are saved to the app's own WhateverScanner folder in Files." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichert jeden Scan automatisch als Bilder in Fotos und/oder als PDF in einem Ordner der Dateien-App. Ist kein Ordner ausgewählt, werden PDFs im appeigenen WhateverScanner-Ordner in Dateien gespeichert."
           }
         }
       }
@@ -42,6 +175,7 @@
       }
     },
     "Connection Failed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -52,11 +186,22 @@
       }
     },
     "Connection Successful" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Verbindung erfolgreich"
+          }
+        }
+      }
+    },
+    "Could not access the selected folder: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zugriff auf den ausgewählten Ordner nicht möglich: %@"
           }
         }
       }
@@ -81,6 +226,26 @@
         }
       }
     },
+    "Default SMB Server" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard-SMB-Server"
+          }
+        }
+      }
+    },
+    "Delete" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschen"
+          }
+        }
+      }
+    },
     "Document Date" : {
       "localizations" : {
         "de" : {
@@ -101,7 +266,18 @@
         }
       }
     },
+    "Document saved to %lld destination(s)." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dokument auf %lld Ziel(en) gespeichert."
+          }
+        }
+      }
+    },
     "Document uploaded to %lld server(s)." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "variations" : {
@@ -171,6 +347,16 @@
         }
       }
     },
+    "Edit SMB Server" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SMB-Server bearbeiten"
+          }
+        }
+      }
+    },
     "Enter your WebDAV server details. You can add or change servers later in Settings." : {
       "localizations" : {
         "de" : {
@@ -201,6 +387,26 @@
         }
       }
     },
+    "Files" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien"
+          }
+        }
+      }
+    },
+    "Folder" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner"
+          }
+        }
+      }
+    },
     "Get Started" : {
       "localizations" : {
         "de" : {
@@ -211,8 +417,40 @@
         }
       }
     },
+    "Host" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Host"
+          }
+        }
+      }
+    },
+    "https://<server-url>/dav/" : {
+
+    },
     "https://cloud.example.com/remote.php/dav/files/user/" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://cloud.example.com/remote.php/dav/files/user/"
+          }
+        }
+      },
       "shouldTranslate" : false
+    },
+    "My NAS" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mein NAS"
+          }
+        }
+      }
     },
     "My Nextcloud" : {
       "localizations" : {
@@ -234,6 +472,29 @@
         }
       }
     },
+    "No destination is enabled in Settings. Enable one, or use the more menu to share, save to Photos, or save to Files." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In den Einstellungen ist kein Ziel aktiviert. Aktiviere eines oder nutze das Mehr-Menü, um zu teilen oder in Fotos bzw. Dateien zu speichern."
+          }
+        }
+      }
+    },
+    "No destinations configured" : {
+
+    },
+    "No Server Configured" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Server konfiguriert"
+          }
+        }
+      }
+    },
     "OK" : {
       "localizations" : {
         "de" : {
@@ -244,12 +505,52 @@
         }
       }
     },
+    "Optional/Sub/Folder" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optional/Unterordner"
+          }
+        }
+      }
+    },
     "Password" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Passwort"
+          }
+        }
+      }
+    },
+    "Path" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pfad"
+          }
+        }
+      }
+    },
+    "Photo library access was denied. Enable it in Settings to save scans as images." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Zugriff auf die Fotomediathek wurde verweigert. Aktiviere ihn in den Einstellungen, um Scans als Bilder zu speichern."
+          }
+        }
+      }
+    },
+    "Photos" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fotos"
           }
         }
       }
@@ -293,6 +594,89 @@
           }
         }
       }
+    },
+    "Save Failed" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichern fehlgeschlagen"
+          }
+        }
+      }
+    },
+    "Save failed:" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichern fehlgeschlagen:"
+          }
+        }
+      }
+    },
+    "Save PDF to Files" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF in Dateien speichern"
+          }
+        }
+      }
+    },
+    "Save Successful" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichern erfolgreich"
+          }
+        }
+      }
+    },
+    "Save to Files" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Dateien speichern"
+          }
+        }
+      }
+    },
+    "Save to Photos" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Fotos speichern"
+          }
+        }
+      }
+    },
+    "Saved" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeichert"
+          }
+        }
+      }
+    },
+    "Saved to %lld destination(s), but failed:" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf %lld Ziel(e) gespeichert, aber fehlgeschlagen:"
+          }
+        }
+      }
+    },
+    "Saving to: %@" : {
+
     },
     "Scan Behaviour" : {
       "localizations" : {
@@ -370,7 +754,18 @@
         }
       }
     },
+    "Scans" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scans"
+          }
+        }
+      }
+    },
     "Server Details" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -380,7 +775,18 @@
         }
       }
     },
+    "Server returned error code %lld." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server hat Fehlercode %lld zurückgegeben."
+          }
+        }
+      }
+    },
     "Servers" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -410,7 +816,48 @@
         }
       }
     },
+    "Share" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Freigabe"
+          }
+        }
+      }
+    },
+    "Share…" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teilen…"
+          }
+        }
+      }
+    },
+    "SMB" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SMB"
+          }
+        }
+      }
+    },
+    "SMB Server Details" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SMB-Serverdetails"
+          }
+        }
+      }
+    },
     "Successfully connected to the server." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -421,6 +868,7 @@
       }
     },
     "Tap a server row to make it the default upload destination." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -450,7 +898,38 @@
         }
       }
     },
+    "The scan was saved to Photos." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Scan wurde in Fotos gespeichert."
+          }
+        }
+      }
+    },
+    "The server URL is invalid." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Server-URL ist ungültig."
+          }
+        }
+      }
+    },
+    "The SMB server host is invalid." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der SMB-Server-Host ist ungültig."
+          }
+        }
+      }
+    },
     "Upload" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -461,6 +940,7 @@
       }
     },
     "Upload Failed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -471,6 +951,7 @@
       }
     },
     "Upload failed:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -481,6 +962,7 @@
       }
     },
     "Upload Successful" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -500,7 +982,18 @@
         }
       }
     },
+    "Upload to All SMB Servers" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf alle SMB-Server hochladen"
+          }
+        }
+      }
+    },
     "Uploaded to %lld server(s), but failed:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "variations" : {
@@ -540,6 +1033,17 @@
         }
       }
     },
+    "Uploading to:" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hochladen auf:"
+          }
+        }
+      }
+    },
     "Uploading to: %@" : {
       "localizations" : {
         "de" : {
@@ -551,6 +1055,7 @@
       }
     },
     "Uploading to: All servers (%lld)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -591,6 +1096,26 @@
         }
       }
     },
+    "WebDAV" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WebDAV"
+          }
+        }
+      }
+    },
+    "WebDAV Server Details" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WebDAV-Serverdetails"
+          }
+        }
+      }
+    },
     "Welcome" : {
       "localizations" : {
         "de" : {
@@ -602,9 +1127,28 @@
       }
     },
     "WhateverScanner" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WhateverScanner"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
+    "WhateverScanner (Default)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WhateverScanner (Standard)"
+          }
+        }
+      }
+    },
     "When disabled, scans are uploaded to the selected default server only." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

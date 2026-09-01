@@ -22,6 +22,16 @@ struct ScanPreviewView: View {
     @State private var uploadStatus: UploadResult?
     @State private var showUploadResult = false
 
+    // Manual export state (Share Sheet / Save to Photos / Save to Files),
+    // available regardless of the destinations configured in Settings.
+    @State private var isPerformingManualAction = false
+    @State private var manualActionMessage: ManualActionMessage?
+    @State private var showManualActionAlert = false
+    @State private var shareItems: [URL] = []
+    @State private var showShareSheet = false
+    @State private var showDocumentExporter = false
+    @State private var exportURL: URL?
+
     /// Whether OCR found a document date.
     private var hasDocumentDate: Bool {
         documentInfo.documentDate != nil
@@ -52,11 +62,34 @@ struct ScanPreviewView: View {
                     }
                     .disabled(isUploading)
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItemGroup(placement: .topBarTrailing) {
                     if isUploading {
                         ProgressView()
                     } else {
-                        Button(String(localized: "Upload")) {
+                        if isPerformingManualAction {
+                            ProgressView()
+                        } else {
+                            Menu {
+                                Button {
+                                    shareDocument()
+                                } label: {
+                                    Label(String(localized: "Share…"), systemImage: "square.and.arrow.up")
+                                }
+                                Button {
+                                    saveToPhotosManually()
+                                } label: {
+                                    Label(String(localized: "Save to Photos"), systemImage: "photo")
+                                }
+                                Button {
+                                    exportToFilesManually()
+                                } label: {
+                                    Label(String(localized: "Save to Files"), systemImage: "folder")
+                                }
+                            } label: {
+                                Image(systemName: "ellipsis.circle")
+                            }
+                        }
+                        Button(String(localized: "Save")) {
                             Task { await upload() }
                         }
                         .buttonStyle(.borderedProminent)
@@ -66,6 +99,14 @@ struct ScanPreviewView: View {
             .sheet(isPresented: $isEditingName) {
                 editSheet
             }
+            .sheet(isPresented: $showShareSheet) {
+                ShareSheet(activityItems: shareItems)
+            }
+            .sheet(isPresented: $showDocumentExporter) {
+                if let exportURL {
+                    DocumentExporterView(url: exportURL)
+                }
+            }
             .alert(uploadAlertTitle, isPresented: $showUploadResult) {
                 Button("OK") {
                     if case .success = uploadStatus {
@@ -74,6 +115,11 @@ struct ScanPreviewView: View {
                 }
             } message: {
                 Text(uploadAlertMessage)
+            }
+            .alert(manualActionMessage?.title ?? "", isPresented: $showManualActionAlert) {
+                Button("OK") {}
+            } message: {
+                Text(manualActionMessage?.message ?? "")
             }
         }
         .interactiveDismissDisabled(isUploading)
@@ -217,22 +263,59 @@ struct ScanPreviewView: View {
 
     // MARK: - Upload
 
-    /// Uploads the PDF to configured servers.
+    /// Saves and uploads the PDF to every destination enabled in Settings
+    /// (WebDAV servers, Photos, a Files app folder, and/or SMB shares).
     @MainActor
     private func upload() async {
+        guard settings.autoUploadToWebDAV || settings.autoSaveToPhotos || settings.autoSaveToFiles || settings.autoUploadToSMB else {
+            uploadStatus = .failure(String(localized: "No destination is enabled in Settings. Enable one, or use the more menu to share, save to Photos, or save to Files."))
+            showUploadResult = true
+            return
+        }
+
         isUploading = true
 
         let filename = generateFilename()
-        let targets = settings.uploadTargets
         var successCount = 0
         var errors: [String] = []
 
-        for server in targets {
+        if settings.autoUploadToWebDAV {
+            for server in settings.uploadTargets {
+                do {
+                    try await WebDAVService.shared.upload(data: pdfData, filename: filename, to: server)
+                    successCount += 1
+                } catch {
+                    errors.append("\(server.name): \(error.localizedDescription)")
+                }
+            }
+        }
+
+        if settings.autoSaveToPhotos {
             do {
-                try await WebDAVService.shared.upload(data: pdfData, filename: filename, to: server)
+                try await PhotosService.save(images: images)
                 successCount += 1
             } catch {
-                errors.append("\(server.name): \(error.localizedDescription)")
+                errors.append("\(String(localized: "Photos")): \(error.localizedDescription)")
+            }
+        }
+
+        if settings.autoSaveToFiles {
+            do {
+                try FilesService.save(data: pdfData, filename: filename, bookmark: settings.filesFolderBookmark)
+                successCount += 1
+            } catch {
+                errors.append("\(String(localized: "Files")): \(error.localizedDescription)")
+            }
+        }
+
+        if settings.autoUploadToSMB {
+            for server in settings.smbUploadTargets {
+                do {
+                    try await SMBService.shared.upload(data: pdfData, filename: filename, to: server)
+                    successCount += 1
+                } catch {
+                    errors.append("\(server.name): \(error.localizedDescription)")
+                }
             }
         }
 
@@ -243,27 +326,83 @@ struct ScanPreviewView: View {
         } else if successCount > 0 {
             let errorSummary = errors.joined(separator: "\n")
             uploadStatus = .failure(
-                String(localized: "Uploaded to \(successCount) server(s), but failed:") + "\n" + errorSummary
+                String(localized: "Saved to \(successCount) destination(s), but failed:") + "\n" + errorSummary
             )
         } else {
             let errorSummary = errors.joined(separator: "\n")
-            uploadStatus = .failure(String(localized: "Upload failed:") + "\n" + errorSummary)
+            uploadStatus = .failure(String(localized: "Save failed:") + "\n" + errorSummary)
         }
         showUploadResult = true
+    }
+
+    // MARK: - Manual Export Actions
+
+    /// Writes the PDF to a temporary file so it can be shared or exported.
+    /// - Returns: The temporary file's URL, or `nil` if writing failed.
+    private func writeTempPDF() -> URL? {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent(generateFilename())
+        do {
+            try pdfData.write(to: url, options: .atomic)
+            return url
+        } catch {
+            return nil
+        }
+    }
+
+    /// Presents the iOS share sheet with the scanned PDF, regardless of configured destinations.
+    private func shareDocument() {
+        guard let url = writeTempPDF() else { return }
+        shareItems = [url]
+        showShareSheet = true
+    }
+
+    /// Saves the scanned pages as images to Photos, regardless of the Auto-Save setting.
+    private func saveToPhotosManually() {
+        isPerformingManualAction = true
+        Task {
+            do {
+                try await PhotosService.save(images: images)
+                await MainActor.run {
+                    isPerformingManualAction = false
+                    manualActionMessage = ManualActionMessage(
+                        title: String(localized: "Saved"),
+                        message: String(localized: "The scan was saved to Photos.")
+                    )
+                    showManualActionAlert = true
+                }
+            } catch {
+                await MainActor.run {
+                    isPerformingManualAction = false
+                    manualActionMessage = ManualActionMessage(
+                        title: String(localized: "Save Failed"),
+                        message: error.localizedDescription
+                    )
+                    showManualActionAlert = true
+                }
+            }
+        }
+    }
+
+    /// Presents a document exporter allowing the user to save the PDF to any Files location,
+    /// regardless of the Auto-Save setting.
+    private func exportToFilesManually() {
+        guard let url = writeTempPDF() else { return }
+        exportURL = url
+        showDocumentExporter = true
     }
 
     // MARK: - Alert Helpers
 
     private var uploadAlertTitle: String {
         guard let status = uploadStatus else { return "" }
-        if case .success = status { return String(localized: "Upload Successful") }
-        return String(localized: "Upload Failed")
+        if case .success = status { return String(localized: "Save Successful") }
+        return String(localized: "Save Failed")
     }
 
     private var uploadAlertMessage: String {
         switch uploadStatus {
         case .success(let count):
-            return String(localized: "Document uploaded to \(count) server(s).")
+            return String(localized: "Document saved to \(count) destination(s).")
         case .failure(let message):
             return message
         case nil:
@@ -284,6 +423,12 @@ private enum DateOption {
 private enum UploadResult {
     case success(Int)
     case failure(String)
+}
+
+/// A simple title/message pair shown after a manual export action completes.
+private struct ManualActionMessage {
+    let title: String
+    let message: String
 }
 
 // MARK: - PDF Preview

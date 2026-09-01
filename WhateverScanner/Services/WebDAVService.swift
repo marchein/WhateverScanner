@@ -16,11 +16,11 @@ enum WebDAVError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidURL:
-            return "The server URL is invalid."
+            return String(localized: "The server URL is invalid.")
         case .authenticationFailed:
-            return "Authentication failed. Check your username and password."
+            return String(localized: "Authentication failed. Check your username and password.")
         case .serverError(let code):
-            return "Server returned error code \(code)."
+            return String(localized: "Server returned error code \(code).")
         case .networkError(let error):
             return error.localizedDescription
         }

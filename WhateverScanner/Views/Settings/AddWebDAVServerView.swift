@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Form view for adding a new WebDAV server or editing an existing one.
 /// Supports connection testing via PROPFIND before saving.
-struct AddServerView: View {
+struct AddWebDAVServerView: View {
     @EnvironmentObject var settings: AppSettings
     @Environment(\.dismiss) private var dismiss
 
@@ -16,7 +16,6 @@ struct AddServerView: View {
 
     @State private var isTesting = false
     @State private var testResult: TestResult?
-    @State private var showTestResult = false
 
     // MARK: - Init
 
@@ -38,32 +37,38 @@ struct AddServerView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Server Details") {
+                Section("WebDAV Server Details") {
                     LabeledContent("Name") {
                         TextField("My Nextcloud", text: $name)
                             .multilineTextAlignment(.trailing)
+                            .onChange(of: name) { resetTestResult() }
                     }
+
+                    // Keep URL in the same row layout as other fields so
+                    // alignment is consistent across the whole form.
                     LabeledContent("URL") {
-                        TextField(
-                            "https://cloud.example.com/remote.php/dav/files/user/",
-                            text: $url
-                        )
-                        .keyboardType(.URL)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-                        .multilineTextAlignment(.trailing)
+                        TextField("https://<server-url>/dav/", text: $url)
+                            .keyboardType(.URL)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .multilineTextAlignment(.trailing)
+                            .onChange(of: url) { resetTestResult() }
                     }
+
                     LabeledContent("Username") {
                         TextField("Username", text: $username)
                             .textContentType(.username)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
                             .multilineTextAlignment(.trailing)
+                            .onChange(of: username) { resetTestResult() }
                     }
+
                     LabeledContent("Password") {
                         SecureField("Password", text: $password)
                             .textContentType(.password)
                             .multilineTextAlignment(.trailing)
+                            .onChange(of: password) { resetTestResult() }
                     }
                 }
 
@@ -72,10 +77,11 @@ struct AddServerView: View {
                         testConnection()
                     } label: {
                         HStack {
-                            if isTesting {
-                                ProgressView().padding(.trailing, 8)
-                            }
                             Text(isTesting ? String(localized: "Testing…") : String(localized: "Test Connection"))
+                            Spacer()
+                            // Show a spinner while testing, a green checkmark on success,
+                            // or a red cross on failure.
+                            connectionStatusIndicator
                         }
                     }
                     .disabled(!isFormValid || isTesting)
@@ -85,17 +91,34 @@ struct AddServerView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") { dismiss() }
+                    Button("Cancel", systemImage: "xmark") {
+                        dismiss()
+                    }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") { saveServer() }
-                        .disabled(!isFormValid)
+                        .buttonStyle(.borderedProminent)
+                        .disabled(!isSaveEnabled)
                 }
             }
-            .alert(testResultTitle, isPresented: $showTestResult) {
-                Button("OK") {}
-            } message: {
-                Text(testResultMessage)
+        }
+    }
+
+    // MARK: - Status Indicator
+
+    /// Displays the appropriate inline indicator based on the current connection test state.
+    @ViewBuilder
+    private var connectionStatusIndicator: some View {
+        if isTesting {
+            ProgressView()
+        } else if let result = testResult {
+            switch result {
+            case .success:
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
+            case .failure:
+                Image(systemName: "xmark.circle.fill")
+                    .foregroundStyle(.red)
             }
         }
     }
@@ -110,21 +133,12 @@ struct AddServerView: View {
         !password.isEmpty
     }
 
-    // MARK: - Alert Helpers
-
-    /// The title string for the connection test result alert.
-    private var testResultTitle: String {
-        if case .success = testResult { return String(localized: "Connection Successful") }
-        return String(localized: "Connection Failed")
-    }
-
-    /// The message body for the connection test result alert.
-    private var testResultMessage: String {
-        switch testResult {
-        case .success:        return String(localized: "Successfully connected to the server.")
-        case .failure(let m): return m
-        case nil:             return ""
-        }
+    /// Whether the Save button should be enabled.
+    /// Requires a valid form and a successful connection test.
+    private var isSaveEnabled: Bool {
+        guard isFormValid else { return false }
+        if case .success = testResult { return true }
+        return false
     }
 
     // MARK: - Actions
@@ -137,9 +151,15 @@ struct AddServerView: View {
         return s
     }
 
+    /// Resets the connection test result when any input field changes.
+    private func resetTestResult() {
+        testResult = nil
+    }
+
     /// Initiates an asynchronous connection test against the configured server using PROPFIND.
     private func testConnection() {
         isTesting = true
+        testResult = nil
         let server = WebDAVServer(
             name: name,
             url: normalizedURL(),
@@ -152,13 +172,11 @@ struct AddServerView: View {
                 await MainActor.run {
                     isTesting = false
                     testResult = .success
-                    showTestResult = true
                 }
             } catch {
                 await MainActor.run {
                     isTesting = false
                     testResult = .failure(error.localizedDescription)
-                    showTestResult = true
                 }
             }
         }
@@ -197,6 +215,6 @@ private enum TestResult {
 }
 
 #Preview {
-    AddServerView()
+    AddWebDAVServerView()
         .environmentObject(AppSettings())
 }
