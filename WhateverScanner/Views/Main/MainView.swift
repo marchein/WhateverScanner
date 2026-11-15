@@ -8,69 +8,74 @@ struct MainView: View {
 
     @State private var showScanner = false
     @State private var showSettings = false
-    @State private var showAddServer = false
     @State private var showScanError = false
     @State private var scanErrorMessage = ""
 
+    /// Set once the scanner was opened automatically, so "Auto-Start Scanner on Launch"
+    /// only triggers once per launch (`onAppear` also fires again whenever a
+    /// full-screen cover such as the preview is dismissed).
+    @State private var hasAutoStarted = false
+
+    /// Result delivered by the document camera, processed once the camera has
+    /// been fully dismissed (presenting the preview while the camera is still
+    /// animating out would be silently dropped by SwiftUI).
+    @State private var pendingScanResult: Result<VNDocumentCameraScan, Error>?
+
     // Preview state
-    @State private var showPreview = false
-    @State private var previewImages: [UIImage] = []
-    @State private var previewPDFData: Data?
-    @State private var previewDocumentInfo: OCRService.DocumentInfo?
+    @State private var preview: ScanPreviewData?
     @State private var isAnalyzing = false
 
     // MARK: - Body
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 32) {
-                if settings.servers.isEmpty && false {
-                    noServerConfiguredView
-                } else {
-                    mainView
-                }
-            }
-            .navigationTitle("WhateverScanner")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button { showSettings = true } label: {
-                        Image(systemName: "gear")
+            mainView
+                .navigationTitle("WhateverScanner")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button { showSettings = true } label: {
+                            Image(systemName: "gear")
+                        }
+                        .accessibilityLabel(Text("Settings"))
                     }
                 }
-            }
-            .fullScreenCover(isPresented: $showScanner) {
-                ScannerView { result in
-                    showScanner = false
-                    handleScanResult(result)
-                }
-                .ignoresSafeArea()
-            }
-            .fullScreenCover(isPresented: $showPreview) {
-                if let pdfData = previewPDFData, let docInfo = previewDocumentInfo {
-                    ScanPreviewView(
-                        images: previewImages,
-                        pdfData: pdfData,
-                        documentInfo: docInfo,
-                        onDismiss: { showPreview = false }
+                .fullScreenCover(isPresented: $showScanner, onDismiss: processPendingScanResult) {
+                    ScannerView(
+                        onCompletion: { result in
+                            pendingScanResult = result
+                            showScanner = false
+                        },
+                        onCancel: {
+                            showScanner = false
+                        }
                     )
+                    .ignoresSafeArea()
                 }
-            }
-            .sheet(isPresented: $showSettings) {
-                SettingsView()
-            }
-            .sheet(isPresented: $showAddServer) {
-                AddWebDAVServerView()
-            }
-            .alert(String(localized: "Scan Error"), isPresented: $showScanError) {
-                Button("OK") {}
-            } message: {
-                Text(scanErrorMessage)
-            }
+                .fullScreenCover(item: $preview) { preview in
+                    ScanPreviewView(
+                        images: preview.images,
+                        pdfData: preview.pdfData,
+                        documentInfo: preview.documentInfo,
+                        scanDate: preview.scanDate,
+                        onDismiss: { self.preview = nil }
+                    )
+                    .environmentObject(settings)
+                }
+                .sheet(isPresented: $showSettings) {
+                    SettingsView()
+                        .environmentObject(settings)
+                }
+                .alert(String(localized: "Scan Error"), isPresented: $showScanError) {
+                    Button("OK") {}
+                } message: {
+                    Text(scanErrorMessage)
+                }
         }
         .onAppear {
-            if settings.autoStartScan {
-                showScanner = true
+            if settings.autoStartScan && !hasAutoStarted {
+                hasAutoStarted = true
+                startScan()
             }
         }
     }
@@ -86,6 +91,7 @@ struct MainView: View {
             Image(systemName: "document.viewfinder.fill")
                 .font(.system(size: 80))
                 .foregroundStyle(Color.accentColor)
+                .accessibilityHidden(true)
             
             Text("Ready to Scan")
                 .font(.largeTitle.bold())
@@ -99,7 +105,7 @@ struct MainView: View {
                     .controlSize(.large)
             } else {
                 Button {
-                    showScanner = true
+                    startScan()
                 } label: {
                     Label("Scan Document", systemImage: "camera.viewfinder")
                         .font(.title2.bold())
@@ -108,41 +114,6 @@ struct MainView: View {
                 }
                 .buttonStyle(.borderedProminent)
             }
-        }
-        .padding()
-    }
-
-    /// Displays an empty state when no server has been configured yet.
-    /// Provides a visual hint and a button that opens `AddWebDAVServerView` directly
-    /// so the user can set up their first server without navigating through settings.
-    @ViewBuilder
-    private var noServerConfiguredView: some View {
-        VStack(spacing: 24) {
-            VStack(spacing: 12) {
-                Image(systemName: "server.rack")
-                    .font(.system(size: 80))
-                    .foregroundStyle(.secondary)
-                
-                Text("No Server Configured")
-                    .font(.largeTitle.bold())
-            }
-            
-            Text("Add a server to start scanning and uploading documents.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
-            
-            
-            Button {
-                showAddServer = true
-            } label: {
-                Label("Add Server", systemImage: "plus")
-                    .font(.title2.bold())
-                    .frame(maxWidth: .infinity)
-                    .padding()
-            }
-            .buttonStyle(.bordered)
         }
         .padding()
     }
@@ -217,43 +188,76 @@ struct MainView: View {
 
     // MARK: - Scan Handling
 
-    /// Processes the result from the document camera, creating a PDF and running OCR analysis
-    /// before showing the preview.
-    /// - Parameter result: The scan result containing either a `VNDocumentCameraScan` or an error.
-    private func handleScanResult(_ result: Result<VNDocumentCameraScan, Error>) {
+    /// Opens the document camera, or explains why it isn't available.
+    private func startScan() {
+        guard ScannerView.isSupported else {
+            scanErrorMessage = String(localized: "Document scanning isn't supported on this device.")
+            showScanError = true
+            return
+        }
+        showScanner = true
+    }
+
+    /// Called once the document camera has been fully dismissed. Processes the
+    /// scan result (if any) that the camera delivered.
+    private func processPendingScanResult() {
+        guard let result = pendingScanResult else { return }
+        pendingScanResult = nil
+
         switch result {
         case .success(let scan):
             guard scan.pageCount > 0 else { return }
             Task { await prepareScanPreview(scan) }
         case .failure(let error):
+            Log.scan.error("Document camera failed: \(error.localizedDescription, privacy: .private)")
             scanErrorMessage = String(localized: "Scan failed: \(error.localizedDescription)")
             showScanError = true
         }
     }
 
     /// Converts the scanned pages to a PDF, runs OCR analysis, and presents the preview.
+    /// The heavy lifting (PDF rendering and text recognition) runs off the main thread.
     /// - Parameter scan: The document camera scan containing one or more pages.
     @MainActor
     private func prepareScanPreview(_ scan: VNDocumentCameraScan) async {
         isAnalyzing = true
+        defer { isAnalyzing = false }
 
+        let scanDate = Date()
         let images = (0..<scan.pageCount).map { scan.imageOfPage(at: $0) }
 
-        guard let pdfData = PDFService.shared.createPDF(from: images) else {
-            isAnalyzing = false
+        async let pdfTask = Task.detached(priority: .userInitiated) {
+            PDFService.shared.createPDF(from: images)
+        }.value
+        async let infoTask = OCRService.shared.analyzeDocument(images: images)
+        let (pdfData, documentInfo) = await (pdfTask, infoTask)
+
+        guard let pdfData else {
+            Log.scan.error("PDF creation failed for \(images.count) page(s)")
             scanErrorMessage = String(localized: "Failed to create PDF from the scanned pages.")
             showScanError = true
             return
         }
 
-        let documentInfo = await OCRService.shared.analyzeDocument(images: images)
-
-        previewImages = images
-        previewPDFData = pdfData
-        previewDocumentInfo = documentInfo
-        isAnalyzing = false
-        showPreview = true
+        preview = ScanPreviewData(
+            images: images,
+            pdfData: pdfData,
+            documentInfo: documentInfo,
+            scanDate: scanDate
+        )
     }
+}
+
+// MARK: - Supporting Types
+
+/// Everything the scan preview needs, bundled so it can drive
+/// `fullScreenCover(item:)` and be released as a whole once the preview closes.
+private struct ScanPreviewData: Identifiable {
+    let id = UUID()
+    let images: [UIImage]
+    let pdfData: Data
+    let documentInfo: OCRService.DocumentInfo
+    let scanDate: Date
 }
 
 #Preview {

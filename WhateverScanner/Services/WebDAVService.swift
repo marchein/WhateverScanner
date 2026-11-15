@@ -12,6 +12,9 @@ enum WebDAVError: LocalizedError {
     case serverError(Int)
     /// A network-level error occurred.
     case networkError(Error)
+    /// The connection was refused because it isn't encrypted (plain `http://` to a
+    /// non-local host is blocked by App Transport Security).
+    case insecureConnection
 
     var errorDescription: String? {
         switch self {
@@ -23,6 +26,8 @@ enum WebDAVError: LocalizedError {
             return String(localized: "Server returned error code \(code).")
         case .networkError(let error):
             return error.localizedDescription
+        case .insecureConnection:
+            return String(localized: "Unencrypted http:// connections are only allowed to servers on your local network. Please use an https:// URL.")
         }
     }
 }
@@ -51,10 +56,7 @@ actor WebDAVService {
     ///   - server: The target WebDAV server configuration.
     /// - Throws: `WebDAVError` if the URL is invalid or the server returns an error.
     func upload(data: Data, filename: String, to server: WebDAVServer) async throws {
-        let urlString = server.url + filename
-        guard let url = URL(string: urlString) else {
-            throw WebDAVError.invalidURL
-        }
+        let url = try Self.uploadURL(for: server, filename: filename)
 
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
@@ -62,15 +64,38 @@ actor WebDAVService {
         request.setValue(basicAuthHeader(username: server.username, password: server.password),
                          forHTTPHeaderField: "Authorization")
 
-        let (_, response) = try await session.upload(for: request, from: data)
-        try validate(response: response)
+        do {
+            let (_, response) = try await session.upload(for: request, from: data)
+            try validate(response: response)
+        } catch let error as WebDAVError {
+            throw error
+        } catch {
+            throw Self.mapNetworkError(error)
+        }
+    }
+
+    /// Builds the destination URL for an uploaded file.
+    ///
+    /// The filename is appended as a properly percent-encoded path component, so
+    /// names containing spaces, umlauts, `#`, `?` or `%` don't produce an invalid URL
+    /// or end up in the query/fragment instead of the path.
+    /// - Parameters:
+    ///   - server: The target WebDAV server configuration.
+    ///   - filename: The destination filename.
+    /// - Returns: The full upload URL.
+    /// - Throws: `WebDAVError.invalidURL` if the server URL can't be parsed.
+    static func uploadURL(for server: WebDAVServer, filename: String) throws -> URL {
+        guard let baseURL = validatedBaseURL(server.url) else {
+            throw WebDAVError.invalidURL
+        }
+        return baseURL.appending(path: filename, directoryHint: .notDirectory)
     }
 
     /// Tests connectivity and authentication against a WebDAV server using a PROPFIND request.
     /// - Parameter server: The server configuration to test.
     /// - Throws: `WebDAVError` if the URL is invalid, authentication fails, or a network error occurs.
     func testConnection(to server: WebDAVServer) async throws {
-        guard let url = URL(string: server.url) else {
+        guard let url = Self.validatedBaseURL(server.url) else {
             throw WebDAVError.invalidURL
         }
 
@@ -87,11 +112,35 @@ actor WebDAVService {
         } catch let error as WebDAVError {
             throw error
         } catch {
-            throw WebDAVError.networkError(error)
+            throw Self.mapNetworkError(error)
         }
     }
 
     // MARK: - Helpers
+
+    /// Parses a server URL string, requiring an `http`/`https` scheme and a host.
+    /// - Parameter string: The configured server URL.
+    /// - Returns: The parsed URL, or `nil` if it isn't a usable WebDAV endpoint.
+    static func validatedBaseURL(_ string: String) -> URL? {
+        let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let url = URL(string: trimmed),
+              let scheme = url.scheme?.lowercased(),
+              scheme == "http" || scheme == "https",
+              let host = url.host, !host.isEmpty else {
+            return nil
+        }
+        return url
+    }
+
+    /// Maps low-level `URLError`s to a `WebDAVError`, giving App Transport Security
+    /// failures a helpful message instead of the generic system one.
+    private static func mapNetworkError(_ error: Error) -> WebDAVError {
+        if let urlError = error as? URLError,
+           urlError.code == .appTransportSecurityRequiresSecureConnection {
+            return .insecureConnection
+        }
+        return .networkError(error)
+    }
 
     /// Validates an HTTP response, throwing appropriate errors for non-success status codes.
     /// - Parameter response: The URL response to validate.

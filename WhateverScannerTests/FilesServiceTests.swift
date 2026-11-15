@@ -46,6 +46,44 @@ final class FilesServiceTests: XCTestCase {
         }
     }
 
+    func testSavingTwiceDoesNotOverwriteExistingFile() throws {
+        let filename = "FilesServiceTest_\(UUID().uuidString).pdf"
+        let folder = FilesService.defaultFolderURL
+        let first = folder.appendingPathComponent(filename)
+        let second = FilesService.uniqueFileURL(in: folder, filename: filename)
+        XCTAssertEqual(first, second, "Without an existing file the original name is used")
+
+        try FilesService.save(data: Data("one".utf8), filename: filename, bookmark: nil)
+        let renamed = FilesService.uniqueFileURL(in: folder, filename: filename)
+        defer {
+            try? FileManager.default.removeItem(at: first)
+            try? FileManager.default.removeItem(at: renamed)
+        }
+        XCTAssertNotEqual(renamed, first)
+        XCTAssertEqual(renamed.pathExtension, "pdf")
+
+        try FilesService.save(data: Data("two".utf8), filename: filename, bookmark: nil)
+        XCTAssertEqual(try Data(contentsOf: first), Data("one".utf8))
+        XCTAssertEqual(try Data(contentsOf: renamed), Data("two".utf8))
+    }
+
+    func testUniqueFileURLKeepsSearchingPastManyCollisions() throws {
+        let folder = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+
+        let filename = "Scan.pdf"
+        try Data().write(to: folder.appendingPathComponent(filename))
+        for index in 2...1000 {
+            try Data().write(to: folder.appendingPathComponent("Scan \(index).pdf"))
+        }
+
+        let url = FilesService.uniqueFileURL(in: folder, filename: filename)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: url.path))
+        XCTAssertEqual(url.lastPathComponent, "Scan 1001.pdf")
+    }
+
     // MARK: - FilesServiceError descriptions
 
     func testAccessDeniedErrorDescription() {

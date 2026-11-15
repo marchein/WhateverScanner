@@ -113,6 +113,11 @@ struct SettingsView: View {
                 } header: {
                     Text("SMB")
                 }
+
+                // MARK: About
+                Section("About") {
+                    LabeledContent("Version", value: Self.appVersion)
+                }
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
@@ -141,6 +146,17 @@ struct SettingsView: View {
                 .ignoresSafeArea()
             }
         }
+    }
+
+    // MARK: - About
+
+    /// The app's marketing version and build number, e.g. "1.0 (42)", so
+    /// TestFlight testers can tell which build they're reporting feedback for.
+    private static var appVersion: String {
+        let info = Bundle.main.infoDictionary
+        let version = info?["CFBundleShortVersionString"] as? String ?? "?"
+        let build = info?["CFBundleVersion"] as? String ?? "?"
+        return "\(version) (\(build))"
     }
 
     // MARK: - Server Row

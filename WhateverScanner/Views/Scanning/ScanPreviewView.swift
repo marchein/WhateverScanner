@@ -12,11 +12,14 @@ struct ScanPreviewView: View {
     let pdfData: Data
     /// OCR analysis result with suggested name and date.
     let documentInfo: OCRService.DocumentInfo
+    /// The moment the document was scanned. Captured once so the filename
+    /// doesn't change between previewing, sharing, and saving.
+    let scanDate: Date
     /// Called when the user confirms upload or cancels.
     let onDismiss: () -> Void
 
-    @State private var documentName: String = ""
-    @State private var selectedDateOption: DateOption = .scanDate
+    @State private var documentName: String
+    @State private var selectedDateOption: DateOption
     @State private var isEditingName = false
     @State private var isUploading = false
     @State private var uploadStatus: UploadResult?
@@ -31,6 +34,27 @@ struct ScanPreviewView: View {
     @State private var showShareSheet = false
     @State private var showDocumentExporter = false
     @State private var exportURL: URL?
+
+    /// Temporary PDF files written for sharing/exporting; removed when the preview closes.
+    @State private var temporaryFiles: [URL] = []
+
+    init(
+        images: [UIImage],
+        pdfData: Data,
+        documentInfo: OCRService.DocumentInfo,
+        scanDate: Date = Date(),
+        onDismiss: @escaping () -> Void
+    ) {
+        self.images = images
+        self.pdfData = pdfData
+        self.documentInfo = documentInfo
+        self.scanDate = scanDate
+        self.onDismiss = onDismiss
+        // Initialised here rather than in `onAppear`, which can fire again (e.g. after
+        // a sheet is dismissed) and would overwrite the name the user typed.
+        _documentName = State(initialValue: documentInfo.suggestedName ?? "Scan")
+        _selectedDateOption = State(initialValue: documentInfo.documentDate != nil ? .documentDate : .scanDate)
+    }
 
     /// Whether OCR found a document date.
     private var hasDocumentDate: Bool {
@@ -93,6 +117,7 @@ struct ScanPreviewView: View {
                             Task { await upload() }
                         }
                         .buttonStyle(.borderedProminent)
+                        .disabled(isPerformingManualAction)
                     }
                 }
             }
@@ -123,12 +148,7 @@ struct ScanPreviewView: View {
             }
         }
         .interactiveDismissDisabled(isUploading)
-        .onAppear {
-            documentName = documentInfo.suggestedName ?? "Scan"
-            if hasDocumentDate {
-                selectedDateOption = .documentDate
-            }
-        }
+        .onDisappear(perform: removeTemporaryFiles)
     }
 
     // MARK: - Document Info Bar
@@ -217,9 +237,9 @@ struct ScanPreviewView: View {
     private var selectedDate: Date {
         switch selectedDateOption {
         case .scanDate:
-            return Date()
+            return scanDate
         case .documentDate:
-            return documentInfo.documentDate ?? Date()
+            return documentInfo.documentDate ?? scanDate
         }
     }
 
@@ -230,7 +250,7 @@ struct ScanPreviewView: View {
 
     /// Label for the scan date option showing today's date.
     private var scanDateLabel: String {
-        let dateStr = Self.mediumDateFormatter.string(from: Date())
+        let dateStr = Self.mediumDateFormatter.string(from: scanDate)
         return String(localized: "Scan Date") + " (\(dateStr))"
     }
 
@@ -245,20 +265,7 @@ struct ScanPreviewView: View {
 
     /// Generates the final filename from user's choices.
     private func generateFilename() -> String {
-        let name = documentName.trimmingCharacters(in: .whitespacesAndNewlines)
-        let safeName = name.isEmpty ? "Scan" : sanitizeFilename(name)
-
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
-        let dateStr = formatter.string(from: selectedDate)
-
-        return "\(safeName)_\(dateStr).pdf"
-    }
-
-    /// Removes characters that are unsafe for filenames.
-    private func sanitizeFilename(_ name: String) -> String {
-        let invalidChars = CharacterSet(charactersIn: "/\\:*?\"<>|")
-        return name.components(separatedBy: invalidChars).joined(separator: "_")
+        ScanFilename.make(name: documentName, date: selectedDate)
     }
 
     // MARK: - Upload
@@ -276,47 +283,8 @@ struct ScanPreviewView: View {
         isUploading = true
 
         let filename = generateFilename()
-        var successCount = 0
-        var errors: [String] = []
-
-        if settings.autoUploadToWebDAV {
-            for server in settings.uploadTargets {
-                do {
-                    try await WebDAVService.shared.upload(data: pdfData, filename: filename, to: server)
-                    successCount += 1
-                } catch {
-                    errors.append("\(server.name): \(error.localizedDescription)")
-                }
-            }
-        }
-
-        if settings.autoSaveToPhotos {
-            do {
-                try await PhotosService.save(images: images)
-                successCount += 1
-            } catch {
-                errors.append("\(String(localized: "Photos")): \(error.localizedDescription)")
-            }
-        }
-
-        if settings.autoSaveToFiles {
-            do {
-                try FilesService.save(data: pdfData, filename: filename, bookmark: settings.filesFolderBookmark)
-                successCount += 1
-            } catch {
-                errors.append("\(String(localized: "Files")): \(error.localizedDescription)")
-            }
-        }
-
-        if settings.autoUploadToSMB {
-            for server in settings.smbUploadTargets {
-                do {
-                    try await SMBService.shared.upload(data: pdfData, filename: filename, to: server)
-                    successCount += 1
-                } catch {
-                    errors.append("\(server.name): \(error.localizedDescription)")
-                }
-            }
+        let (successCount, errors) = await BackgroundTask.run(named: "Save scan") {
+            await saveToEnabledDestinations(filename: filename)
         }
 
         isUploading = false
@@ -335,18 +303,94 @@ struct ScanPreviewView: View {
         showUploadResult = true
     }
 
+    /// Saves/uploads the PDF to every enabled destination, continuing past failures.
+    /// - Parameter filename: The filename to use for the PDF.
+    /// - Returns: The number of successful destinations and a message per failure.
+    @MainActor
+    private func saveToEnabledDestinations(filename: String) async -> (successCount: Int, errors: [String]) {
+        var successCount = 0
+        var errors: [String] = []
+
+        if settings.autoUploadToWebDAV {
+            for server in settings.uploadTargets {
+                do {
+                    try await WebDAVService.shared.upload(data: pdfData, filename: filename, to: server)
+                    successCount += 1
+                } catch {
+                    Log.export.error("WebDAV upload failed: \(error.localizedDescription, privacy: .private)")
+                    errors.append("\(server.name): \(error.localizedDescription)")
+                }
+            }
+        }
+
+        if settings.autoSaveToPhotos {
+            do {
+                try await PhotosService.save(images: images)
+                successCount += 1
+            } catch {
+                Log.export.error("Saving to Photos failed: \(error.localizedDescription, privacy: .private)")
+                errors.append("\(String(localized: "Photos")): \(error.localizedDescription)")
+            }
+        }
+
+        if settings.autoSaveToFiles {
+            do {
+                if let refreshed = try FilesService.save(data: pdfData, filename: filename, bookmark: settings.filesFolderBookmark) {
+                    settings.filesFolderBookmark = refreshed
+                }
+                successCount += 1
+            } catch {
+                errors.append("\(String(localized: "Files")): \(error.localizedDescription)")
+            }
+        }
+
+        if settings.autoUploadToSMB {
+            for server in settings.smbUploadTargets {
+                do {
+                    try await SMBService.shared.upload(data: pdfData, filename: filename, to: server)
+                    successCount += 1
+                } catch {
+                    Log.export.error("SMB upload failed: \(error.localizedDescription, privacy: .private)")
+                    errors.append("\(server.name): \(error.localizedDescription)")
+                }
+            }
+        }
+
+        return (successCount, errors)
+    }
+
     // MARK: - Manual Export Actions
 
     /// Writes the PDF to a temporary file so it can be shared or exported.
     /// - Returns: The temporary file's URL, or `nil` if writing failed.
     private func writeTempPDF() -> URL? {
-        let url = FileManager.default.temporaryDirectory.appendingPathComponent(generateFilename())
+        // Use a unique sub-directory so the shared file keeps its nice name
+        // without colliding with earlier exports.
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let url = directory.appendingPathComponent(generateFilename())
         do {
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
             try pdfData.write(to: url, options: .atomic)
+            temporaryFiles.append(directory)
             return url
         } catch {
+            Log.export.error("Writing temporary PDF failed: \(error.localizedDescription, privacy: .private)")
+            manualActionMessage = ManualActionMessage(
+                title: String(localized: "Save Failed"),
+                message: error.localizedDescription
+            )
+            showManualActionAlert = true
             return nil
         }
+    }
+
+    /// Deletes the temporary files created for sharing/exporting.
+    private func removeTemporaryFiles() {
+        for url in temporaryFiles {
+            try? FileManager.default.removeItem(at: url)
+        }
+        temporaryFiles.removeAll()
     }
 
     /// Presents the iOS share sheet with the scanned PDF, regardless of configured destinations.

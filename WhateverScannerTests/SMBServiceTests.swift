@@ -30,6 +30,39 @@ final class SMBServiceTests: XCTestCase {
         }
     }
 
+    // MARK: - Path normalization
+
+    func testNormalizedDirectoryTrimsSlashesAndWhitespace() {
+        XCTAssertEqual(SMBService.normalizedDirectory(" /Scans/2024/ "), "Scans/2024")
+    }
+
+    func testNormalizedDirectoryConvertsBackslashes() {
+        XCTAssertEqual(SMBService.normalizedDirectory("Scans\\Inbox"), "Scans/Inbox")
+    }
+
+    func testNormalizedDirectoryPreservesWhitespaceInsideFolderNames() {
+        XCTAssertEqual(SMBService.normalizedDirectory("Scans/ Inbox"), "Scans/ Inbox")
+        XCTAssertEqual(SMBService.normalizedDirectory("My Scans/Tax 2024 "), "My Scans/Tax 2024")
+    }
+
+    func testNormalizedDirectoryCollapsesEmptyComponents() {
+        XCTAssertEqual(SMBService.normalizedDirectory("Scans//Inbox"), "Scans/Inbox")
+        XCTAssertEqual(SMBService.normalizedDirectory("/"), "")
+        XCTAssertEqual(SMBService.normalizedDirectory(""), "")
+    }
+
+    func testUploadWithHostContainingSpacesThrowsInvalidHost() async {
+        let server = SMBServer(name: "Bad", host: "my nas", share: "share", username: "u", password: "p")
+        do {
+            try await SMBService.shared.upload(data: Data("x".utf8), filename: "f.pdf", to: server)
+            XCTFail("Expected an error to be thrown")
+        } catch SMBError.invalidHost {
+            // expected
+        } catch {
+            XCTFail("Expected invalidHost, got \(error)")
+        }
+    }
+
     // MARK: - SMBError descriptions
 
     func testInvalidHostErrorDescription() {

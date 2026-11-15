@@ -25,6 +25,12 @@
             "state" : "new",
             "value" : "%1$@/%2$@"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@/%2$@"
+          }
         }
       }
     },
@@ -34,6 +40,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "192.168.1.10"
+          }
+        }
+      }
+    },
+    "About" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über"
           }
         }
       }
@@ -89,10 +105,24 @@
       }
     },
     "All servers (%lld)" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Server (%lld)"
+          }
+        }
+      }
     },
     "All SMB shares (%lld)" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle SMB-Freigaben (%lld)"
+          }
+        }
+      }
     },
     "Analyzing…" : {
       "localizations" : {
@@ -276,6 +306,16 @@
         }
       }
     },
+    "Document scanning isn't supported on this device." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Scannen von Dokumenten wird auf diesem Gerät nicht unterstützt."
+          }
+        }
+      }
+    },
     "Document uploaded to %lld server(s)." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -428,7 +468,14 @@
       }
     },
     "https://<server-url>/dav/" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://<server-url>/dav/"
+          }
+        }
+      }
     },
     "https://cloud.example.com/remote.php/dav/files/user/" : {
       "extractionState" : "stale",
@@ -483,7 +530,14 @@
       }
     },
     "No destinations configured" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Ziele konfiguriert"
+          }
+        }
+      }
     },
     "No Server Configured" : {
       "localizations" : {
@@ -676,7 +730,14 @@
       }
     },
     "Saving to: %@" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichern in: %@"
+          }
+        }
+      }
     },
     "Scan Behaviour" : {
       "localizations" : {
@@ -708,12 +769,12 @@
         }
       }
     },
-    "Scan documents and upload them directly to your WebDAV server — e.g. Nextcloud." : {
+    "Scan documents and save them to Files or Photos, or upload them directly to your WebDAV (e.g. Nextcloud) or SMB server." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dokumente scannen und direkt auf deinen WebDAV-Server hochladen — z. B. Nextcloud."
+            "value" : "Scanne Dokumente und speichere sie in Dateien oder Fotos – oder lade sie direkt auf deinen WebDAV- (z. B. Nextcloud) oder SMB-Server hoch."
           }
         }
       }
@@ -760,6 +821,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Scans"
+          }
+        }
+      }
+    },
+    "Scans will be saved to the WhateverScanner folder in the Files app. You can add WebDAV or SMB servers later in Settings." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scans werden im Ordner „WhateverScanner“ in der Dateien-App gespeichert. WebDAV- oder SMB-Server kannst du später in den Einstellungen hinzufügen."
           }
         }
       }
@@ -832,6 +903,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Teilen…"
+          }
+        }
+      }
+    },
+    "Skip for Now" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Später einrichten"
           }
         }
       }
@@ -924,6 +1005,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Der SMB-Server-Host ist ungültig."
+          }
+        }
+      }
+    },
+    "Unencrypted http:// connections are only allowed to servers on your local network. Please use an https:// URL." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unverschlüsselte http://-Verbindungen sind nur zu Servern in deinem lokalen Netzwerk erlaubt. Bitte verwende eine https://-URL."
           }
         }
       }
@@ -1092,6 +1183,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Benutzername"
+          }
+        }
+      }
+    },
+    "Version" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version"
           }
         }
       }

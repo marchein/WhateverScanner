@@ -47,11 +47,23 @@ targets:
       - path: WhateverScanner/AppIcon.icon
       - path: WhateverScanner/Assets.xcassets
       - path: WhateverScanner/Localizable.xcstrings
+      # Localized Info.plist strings (permission prompts, display name).
+      - path: WhateverScanner/InfoPlist.xcstrings
+      # Privacy manifest, required for App Store submissions.
+      - path: WhateverScanner/PrivacyInfo.xcprivacy
 
     # Swift Package Manager dependencies
     dependencies:
       - package: AMSMB2
         embed: true
+
+    # Generates a *shared* scheme (required by Xcode Cloud and command-line
+    # builds) that builds the app, runs the unit tests and archives with the
+    # Release configuration for TestFlight/App Store distribution.
+    scheme:
+      testTargets:
+        - WhateverScannerTests
+      gatherCoverageData: true
 
     # Build settings specific to this target
     settings:
@@ -73,6 +85,9 @@ targets:
       SWIFT_EMIT_LOC_STRINGS: "YES"
       SWIFT_VERSION: "5.0"
       TARGETED_DEVICE_FAMILY: "1,2"
+      LOCALIZATION_PREFERS_STRING_CATALOGS: "YES"
+      DEAD_CODE_STRIPPING: "YES"
+      ENABLE_USER_SCRIPT_SANDBOXING: "YES"
 
   # Unit tests target
   WhateverScannerTests:
@@ -100,7 +115,7 @@ targets:
       PRODUCT_BUNDLE_IDENTIFIER: de.marc-hein.whateverscanner.tests
       SWIFT_EMIT_LOC_STRINGS: "NO"
       SWIFT_VERSION: "5.0"
-      TARGETED_DEVICE_FAMILY: "1"
+      TARGETED_DEVICE_FAMILY: "1,2"
       TEST_HOST: $(BUILT_PRODUCTS_DIR)/WhateverScanner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WhateverScanner
 
 # Global build configurations
@@ -117,6 +132,8 @@ configurations:
   
   Release:
     settings:
+      # dSYMs are uploaded with the archive so crash reports from TestFlight
+      # testers are symbolicated in Xcode's Organizer / App Store Connect.
       DEBUG_INFORMATION_FORMAT: dwarf-with-dsym
       ENABLE_NS_ASSERTIONS: "NO"
       SWIFT_COMPILATION_MODE: wholemodule
