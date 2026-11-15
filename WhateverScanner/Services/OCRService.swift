@@ -61,7 +61,7 @@ class OCRService {
         do {
             try handler.perform([request])
         } catch {
-            Log.scan.error("OCR failed: \(error.localizedDescription, privacy: .public)")
+            Log.scan.error("OCR failed: \(error.localizedDescription, privacy: .private)")
             return []
         }
 

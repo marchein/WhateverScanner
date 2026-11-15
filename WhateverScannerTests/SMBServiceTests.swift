@@ -40,6 +40,11 @@ final class SMBServiceTests: XCTestCase {
         XCTAssertEqual(SMBService.normalizedDirectory("Scans\\Inbox"), "Scans/Inbox")
     }
 
+    func testNormalizedDirectoryPreservesWhitespaceInsideFolderNames() {
+        XCTAssertEqual(SMBService.normalizedDirectory("Scans/ Inbox"), "Scans/ Inbox")
+        XCTAssertEqual(SMBService.normalizedDirectory("My Scans/Tax 2024 "), "My Scans/Tax 2024")
+    }
+
     func testNormalizedDirectoryCollapsesEmptyComponents() {
         XCTAssertEqual(SMBService.normalizedDirectory("Scans//Inbox"), "Scans/Inbox")
         XCTAssertEqual(SMBService.normalizedDirectory("/"), "")

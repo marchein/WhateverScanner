@@ -3,9 +3,13 @@ import Foundation
 /// Builds the filename used when saving/uploading a scanned PDF.
 enum ScanFilename {
 
-    /// Maximum length of the name part (without date and extension). Keeps the
-    /// full filename well below the 255-byte limit of most file systems/servers.
+    /// Maximum length of the name part (without date and extension), in characters.
     static let maxNameLength = 80
+
+    /// Maximum size of the name part in UTF-8 bytes. Most file systems and WebDAV/SMB
+    /// servers limit a path component to 255 bytes; this reserves room for the
+    /// timestamp, the extension and any numeric collision suffix (" 123…").
+    static let maxNameBytes = 255 - "_yyyy-MM-dd_HH-mm-ss \(Int.max).pdf".utf8.count
 
     private static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -45,6 +49,11 @@ enum ScanFilename {
         while result.hasPrefix(".") { result.removeFirst() }
         if result.count > maxNameLength {
             result = String(result.prefix(maxNameLength))
+        }
+        // Multi-byte characters (CJK, emoji) can exceed the byte limit well before
+        // the character limit; drop whole characters until it fits.
+        while result.utf8.count > maxNameBytes {
+            result.removeLast()
         }
         while result.hasSuffix(".") || result.hasSuffix(" ") { result.removeLast() }
         return result

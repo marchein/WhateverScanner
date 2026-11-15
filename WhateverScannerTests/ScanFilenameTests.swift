@@ -43,6 +43,23 @@ final class ScanFilenameTests: XCTestCase {
         XCTAssertEqual(ScanFilename.sanitize(long).count, ScanFilename.maxNameLength)
     }
 
+    func testSanitizeLimitsUTF8ByteLength() {
+        let cjk = String(repeating: "書", count: 80) // 3 bytes per character
+        let sanitized = ScanFilename.sanitize(cjk)
+        XCTAssertLessThanOrEqual(sanitized.utf8.count, ScanFilename.maxNameBytes)
+        XCTAssertTrue(sanitized.allSatisfy { $0 == "書" }, "Only whole characters are removed")
+
+        let filename = ScanFilename.make(name: cjk, date: fixedDate)
+        XCTAssertLessThanOrEqual(filename.utf8.count + " \(Int.max)".utf8.count, 255)
+    }
+
+    func testSanitizeDoesNotSplitEmoji() {
+        let emoji = String(repeating: "👨‍👩‍👧‍👦", count: 80)
+        let sanitized = ScanFilename.sanitize(emoji)
+        XCTAssertLessThanOrEqual(sanitized.utf8.count, ScanFilename.maxNameBytes)
+        XCTAssertTrue(sanitized.allSatisfy { $0 == "👨‍👩‍👧‍👦" })
+    }
+
     func testSanitizeKeepsUmlautsAndSpaces() {
         XCTAssertEqual(ScanFilename.sanitize("Müller GmbH - Rechnung"), "Müller GmbH - Rechnung")
     }

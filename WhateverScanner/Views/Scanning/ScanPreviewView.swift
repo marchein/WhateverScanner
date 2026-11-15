@@ -317,7 +317,7 @@ struct ScanPreviewView: View {
                     try await WebDAVService.shared.upload(data: pdfData, filename: filename, to: server)
                     successCount += 1
                 } catch {
-                    Log.export.error("WebDAV upload failed: \(error.localizedDescription, privacy: .public)")
+                    Log.export.error("WebDAV upload failed: \(error.localizedDescription, privacy: .private)")
                     errors.append("\(server.name): \(error.localizedDescription)")
                 }
             }
@@ -328,7 +328,7 @@ struct ScanPreviewView: View {
                 try await PhotosService.save(images: images)
                 successCount += 1
             } catch {
-                Log.export.error("Saving to Photos failed: \(error.localizedDescription, privacy: .public)")
+                Log.export.error("Saving to Photos failed: \(error.localizedDescription, privacy: .private)")
                 errors.append("\(String(localized: "Photos")): \(error.localizedDescription)")
             }
         }
@@ -350,7 +350,7 @@ struct ScanPreviewView: View {
                     try await SMBService.shared.upload(data: pdfData, filename: filename, to: server)
                     successCount += 1
                 } catch {
-                    Log.export.error("SMB upload failed: \(error.localizedDescription, privacy: .public)")
+                    Log.export.error("SMB upload failed: \(error.localizedDescription, privacy: .private)")
                     errors.append("\(server.name): \(error.localizedDescription)")
                 }
             }
@@ -375,7 +375,7 @@ struct ScanPreviewView: View {
             temporaryFiles.append(directory)
             return url
         } catch {
-            Log.export.error("Writing temporary PDF failed: \(error.localizedDescription, privacy: .public)")
+            Log.export.error("Writing temporary PDF failed: \(error.localizedDescription, privacy: .private)")
             manualActionMessage = ManualActionMessage(
                 title: String(localized: "Save Failed"),
                 message: error.localizedDescription

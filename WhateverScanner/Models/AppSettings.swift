@@ -270,7 +270,7 @@ class AppSettings: ObservableObject {
         do {
             try KeychainService.save(password: server.password, forKey: server.id.uuidString)
         } catch {
-            Log.settings.error("Saving WebDAV password failed: \(error.localizedDescription, privacy: .public)")
+            Log.settings.error("Saving WebDAV password failed: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -299,7 +299,7 @@ class AppSettings: ObservableObject {
         do {
             try KeychainService.save(password: server.password, forKey: "smb-" + server.id.uuidString)
         } catch {
-            Log.settings.error("Saving SMB password failed: \(error.localizedDescription, privacy: .public)")
+            Log.settings.error("Saving SMB password failed: \(error.localizedDescription, privacy: .private)")
         }
     }
 

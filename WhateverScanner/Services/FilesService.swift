@@ -78,21 +78,23 @@ enum FilesService {
     }
 
     /// Returns a URL for `filename` inside `folder` that doesn't exist yet, appending
-    /// " 2", " 3", … to the base name if needed.
+    /// " 2", " 3", … to the base name if needed. Never returns an occupied URL, so
+    /// an existing scan is never replaced.
     static func uniqueFileURL(in folder: URL, filename: String) -> URL {
         let candidate = folder.appendingPathComponent(filename)
         guard FileManager.default.fileExists(atPath: candidate.path) else { return candidate }
 
         let base = (filename as NSString).deletingPathExtension
         let ext = (filename as NSString).pathExtension
-        for index in 2...999 {
+        var index = 2
+        while true {
             let name = ext.isEmpty ? "\(base) \(index)" : "\(base) \(index).\(ext)"
             let url = folder.appendingPathComponent(name)
             if !FileManager.default.fileExists(atPath: url.path) {
                 return url
             }
+            index += 1
         }
-        return candidate
     }
 
     // MARK: - Private
@@ -116,7 +118,7 @@ enum FilesService {
         do {
             try data.write(to: url, options: .atomic)
         } catch {
-            Log.export.error("Writing file failed: \(error.localizedDescription, privacy: .public)")
+            Log.export.error("Writing file failed: \(error.localizedDescription, privacy: .private)")
             throw FilesServiceError.writeFailed(error)
         }
     }

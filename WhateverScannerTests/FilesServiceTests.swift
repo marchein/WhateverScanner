@@ -67,6 +67,23 @@ final class FilesServiceTests: XCTestCase {
         XCTAssertEqual(try Data(contentsOf: renamed), Data("two".utf8))
     }
 
+    func testUniqueFileURLKeepsSearchingPastManyCollisions() throws {
+        let folder = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+
+        let filename = "Scan.pdf"
+        try Data().write(to: folder.appendingPathComponent(filename))
+        for index in 2...1000 {
+            try Data().write(to: folder.appendingPathComponent("Scan \(index).pdf"))
+        }
+
+        let url = FilesService.uniqueFileURL(in: folder, filename: filename)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: url.path))
+        XCTAssertEqual(url.lastPathComponent, "Scan 1001.pdf")
+    }
+
     // MARK: - FilesServiceError descriptions
 
     func testAccessDeniedErrorDescription() {

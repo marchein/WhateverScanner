@@ -209,7 +209,7 @@ struct MainView: View {
             guard scan.pageCount > 0 else { return }
             Task { await prepareScanPreview(scan) }
         case .failure(let error):
-            Log.scan.error("Document camera failed: \(error.localizedDescription, privacy: .public)")
+            Log.scan.error("Document camera failed: \(error.localizedDescription, privacy: .private)")
             scanErrorMessage = String(localized: "Scan failed: \(error.localizedDescription)")
             showScanError = true
         }

@@ -71,16 +71,17 @@ actor SMBService {
         }
     }
 
-    /// Normalizes a user-entered sub-path within a share: trims whitespace and
-    /// leading/trailing slashes and converts backslashes to forward slashes.
+    /// Normalizes a user-entered sub-path within a share: trims whitespace around
+    /// the whole path, removes leading/trailing/duplicate slashes and converts
+    /// backslashes to forward slashes. Whitespace inside folder names is preserved
+    /// (e.g. `"Scans/ Inbox"` stays `"Scans/ Inbox"`), so existing folders are hit exactly.
     /// - Parameter path: The configured path (may be empty).
     /// - Returns: A path like `"Scans/2024"`, or an empty string for the share root.
     static func normalizedDirectory(_ path: String) -> String {
         path
+            .trimmingCharacters(in: .whitespacesAndNewlines)
             .replacingOccurrences(of: "\\", with: "/")
-            .split(separator: "/")
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.isEmpty }
+            .split(separator: "/", omittingEmptySubsequences: true)
             .joined(separator: "/")
     }
 
@@ -98,7 +99,7 @@ actor SMBService {
             do {
                 try await client.createDirectory(atPath: current)
             } catch {
-                Log.export.debug("SMB createDirectory failed: \(error.localizedDescription, privacy: .public)")
+                Log.export.debug("SMB createDirectory failed: \(error.localizedDescription, privacy: .private)")
             }
         }
     }
