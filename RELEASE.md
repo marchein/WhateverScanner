@@ -14,8 +14,9 @@ verteilt und später im App Store veröffentlicht wird.
   - Bundle-ID: `de.marc-hein.whateverscanner`
   - SKU: frei wählbar, z. B. `whateverscanner`
 - [ ] **Datenschutzerklärung** öffentlich erreichbar hosten (Pflicht für jede App).
-      Eine Vorlage liegt in [PRIVACY.md](PRIVACY.md) – z. B. über GitHub Pages veröffentlichen
-      und die URL in App Store Connect unter *App-Informationen → Datenschutzrichtlinien-URL* eintragen.
+      Der Text liegt in [PRIVACY.md](PRIVACY.md); da das Repo öffentlich ist, kann direkt
+      `https://github.com/marchein/WhateverScanner/blob/main/PRIVACY.md` (nach dem Merge auf `main`)
+      in App Store Connect unter *App-Informationen → Datenschutzrichtlinien-URL* eingetragen werden.
 - [ ] **App-Datenschutz** („Nutzungsangaben“) in App Store Connect ausfüllen:
       *„Wir erfassen keine Daten von dieser App“* – die App hat kein Tracking, keine Analytics,
       keinen eigenen Server. Dokumente gehen nur an die Ziele, die der Nutzer selbst konfiguriert.
@@ -91,9 +92,8 @@ Zusätzlich zu TestFlight benötigt die App-Store-Einreichung:
 - [ ] Build auswählen → *Zur Prüfung einreichen*.
 
 ### Bekannte Punkte, die du vor der Einreichung noch prüfen solltest
-- **App-Icon**: Das Icon basiert auf dem SF Symbol `document.viewfinder.fill`. Laut SF-Symbols-Lizenz
-  dürfen SF Symbols **nicht in App-Icons** verwendet werden. Für den App Store sollte das Icon
-  durch eine eigene Grafik ersetzt werden (Icon Composer: `WhateverScanner/AppIcon.icon`).
+- **App-Icon**: Das Icon nutzt eine eigene Vektorgrafik (`WhateverScanner/AppIcon.icon/Assets/scan-glyph.svg`,
+      Dokument im Sucher-Rahmen) und enthält keine SF Symbols. Anpassungen am besten in Icon Composer vornehmen.
 - **App-Name**: Prüfe vorab in App Store Connect, ob der Name „WhateverScanner“ noch frei ist.
 - **HTTP-Server**: Unverschlüsselte `http://`-WebDAV-Server funktionieren nur im lokalen Netz
   (`.local`-Namen, Hostnamen ohne Domain). Für Server im Internet ist `https://` Pflicht

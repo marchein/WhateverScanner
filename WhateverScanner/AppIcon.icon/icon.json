@@ -25,10 +25,10 @@
             "solid" : "extended-gray:1.00000,1.00000"
           },
           "glass" : true,
-          "image-name" : "document.viewfinder.fill@3x.png",
-          "name" : "document.viewfinder.fill@3x",
+          "image-name" : "scan-glyph.svg",
+          "name" : "scan-glyph",
           "position" : {
-            "scale" : 0.24999999999999997,
+            "scale" : 1,
             "translation-in-points" : [
               0,
               0
