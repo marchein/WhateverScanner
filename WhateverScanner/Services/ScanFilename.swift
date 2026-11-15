@@ -37,7 +37,11 @@ enum ScanFilename {
     /// - Returns: The sanitized, trimmed and length-limited name.
     static func sanitize(_ name: String) -> String {
         var invalid = CharacterSet(charactersIn: "/\\:*?\"<>|")
-        invalid.formUnion(.controlCharacters)
+        // Only real control characters (Unicode category Cc: C0 and C1 ranges).
+        // `CharacterSet.controlCharacters` also contains format characters (Cf) such
+        // as the zero-width joiner, which would break emoji like 👨‍👩‍👧‍👦 apart.
+        invalid.insert(charactersIn: Unicode.Scalar(UInt8(0x00))...Unicode.Scalar(UInt8(0x1F)))
+        invalid.insert(charactersIn: Unicode.Scalar(UInt8(0x7F))...Unicode.Scalar(UInt8(0x9F)))
         invalid.formUnion(.newlines)
 
         var result = name

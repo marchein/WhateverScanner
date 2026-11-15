@@ -60,6 +60,10 @@ final class ScanFilenameTests: XCTestCase {
         XCTAssertTrue(sanitized.allSatisfy { $0 == "👨‍👩‍👧‍👦" })
     }
 
+    func testSanitizeKeepsZeroWidthJoinerEmoji() {
+        XCTAssertEqual(ScanFilename.sanitize("Familie 👨‍👩‍👧‍👦"), "Familie 👨‍👩‍👧‍👦")
+    }
+
     func testSanitizeKeepsUmlautsAndSpaces() {
         XCTAssertEqual(ScanFilename.sanitize("Müller GmbH - Rechnung"), "Müller GmbH - Rechnung")
     }
