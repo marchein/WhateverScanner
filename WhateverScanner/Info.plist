@@ -18,10 +18,19 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>WhateverScanner uses the camera to scan documents.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>WhateverScanner connects to servers on your local network (e.g. a NAS via SMB or WebDAV) to upload your scanned documents.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>WhateverScanner can save scanned documents as images to your photo library.</string>
 	<key>UIApplicationSceneManifest</key>
@@ -35,8 +44,6 @@
 	<true/>
 	<key>UILaunchScreen</key>
 	<dict/>
-	<key>UIStatusBarStyle</key>
-	<string></string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationLandscapeLeft</string>

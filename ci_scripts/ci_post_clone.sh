@@ -2,8 +2,11 @@
 # Xcode Cloud post-clone hook: regenerate the .xcodeproj from project.yml so
 # Xcode Cloud always builds against a fresh, correct project structure instead
 # of a possibly-stale committed project.pbxproj.
-set -e
+set -eu
 
+# Skip Homebrew's (slow) self-update; we only need the latest xcodegen bottle.
+export HOMEBREW_NO_AUTO_UPDATE=1
+export HOMEBREW_NO_INSTALL_CLEANUP=1
 brew install xcodegen
 
 cd "$CI_PRIMARY_REPOSITORY_PATH"
@@ -19,3 +22,9 @@ xcodegen generate
 SWIFTPM_DIR="WhateverScanner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm"
 mkdir -p "$SWIFTPM_DIR"
 cp ci_scripts/Package.resolved "$SWIFTPM_DIR/Package.resolved"
+
+# Sanity check: Xcode Cloud can only build schemes that are shared.
+if [ ! -f "WhateverScanner.xcodeproj/xcshareddata/xcschemes/WhateverScanner.xcscheme" ]; then
+    echo "error: shared scheme WhateverScanner.xcscheme was not generated" >&2
+    exit 1
+fi

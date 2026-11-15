@@ -40,11 +40,12 @@ struct OnboardingView: View {
             Image(systemName: "doc.text.viewfinder")
                 .font(.system(size: 80))
                 .foregroundStyle(Color.accentColor)
+                .accessibilityHidden(true)
 
             Text("WhateverScanner")
                 .font(.largeTitle.bold())
 
-            Text("Scan documents and upload them directly to your WebDAV server — e.g. Nextcloud.")
+            Text("Scan documents and save them to Files or Photos, or upload them directly to your WebDAV (e.g. Nextcloud) or SMB server.")
                 .font(.body)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
@@ -111,6 +112,18 @@ struct OnboardingView: View {
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
                 .disabled(!isFormValid)
+
+                VStack(spacing: 8) {
+                    Button("Skip for Now") {
+                        skipServerSetup()
+                    }
+                    .controlSize(.large)
+
+                    Text("Scans will be saved to the WhateverScanner folder in the Files app. You can add WebDAV or SMB servers later in Settings.")
+                        .font(.footnote)
+                        .multilineTextAlignment(.center)
+                        .foregroundStyle(.secondary)
+                }
                 .padding(.bottom, 40)
             }
             .padding()
@@ -147,7 +160,7 @@ struct OnboardingView: View {
         var urlString = serverURL.trimmingCharacters(in: .whitespaces)
         if !urlString.hasSuffix("/") { urlString += "/" }
 
-        guard URL(string: urlString) != nil else {
+        guard WebDAVService.validatedBaseURL(urlString) != nil else {
             errorMessage = String(localized: "Please enter a valid server URL.")
             showError = true
             return
@@ -160,6 +173,14 @@ struct OnboardingView: View {
             password: password
         )
         settings.addServer(server)
+        settings.completeSetup()
+    }
+
+    /// Finishes onboarding without configuring a server. Saving PDFs to the app's
+    /// own Files folder is enabled so that the "Save" button works out of the box.
+    private func skipServerSetup() {
+        settings.autoUploadToWebDAV = false
+        settings.autoSaveToFiles = true
         settings.completeSetup()
     }
 }

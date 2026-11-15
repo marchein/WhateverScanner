@@ -50,6 +50,27 @@ final class PDFServiceTests: XCTestCase {
         XCTAssertEqual(bounds.height / bounds.width, 2.0, accuracy: 0.01)
     }
 
+    func testLargeImagesAreDownscaledForEmbedding() {
+        let image = Self.makeImage(width: 3000, height: 4000, color: .gray)
+        let compressed = PDFService.compressedPageImage(from: image)
+        XCTAssertLessThanOrEqual(compressed.size.width * compressed.scale, PDFService.maxImagePixelWidth + 1)
+        let ratio = (compressed.size.height * compressed.scale) / (compressed.size.width * compressed.scale)
+        XCTAssertEqual(ratio, 4.0 / 3.0, accuracy: 0.01)
+    }
+
+    func testSmallImagesAreNotUpscaled() {
+        let image = Self.makeImage(width: 100, height: 200, color: .gray)
+        let compressed = PDFService.compressedPageImage(from: image)
+        XCTAssertEqual(compressed.size.width * compressed.scale, image.size.width * image.scale, accuracy: 1)
+    }
+
+    func testPDFOfLargeScanStaysReasonablySmall() throws {
+        let image = Self.makeImage(width: 3000, height: 4000, color: .white)
+        let data = try XCTUnwrap(PDFService.shared.createPDF(from: [image]))
+        // An uncompressed 3000x4000 RGBA bitmap would be ~48 MB.
+        XCTAssertLessThan(data.count, 2_000_000)
+    }
+
     func testGenerateFilenameFormat() {
         let filename = PDFService.shared.generateFilename()
         XCTAssertTrue(filename.hasPrefix("Scan_"))
@@ -66,7 +87,10 @@ final class PDFServiceTests: XCTestCase {
     // MARK: - Helpers
 
     private static func makeImage(width: CGFloat, height: CGFloat, color: UIColor) -> UIImage {
-        let renderer = UIGraphicsImageRenderer(size: CGSize(width: width, height: height))
+        // Scale 1 so `width`/`height` are pixels, independent of the simulator's screen scale.
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: width, height: height), format: format)
         return renderer.image { context in
             color.setFill()
             context.fill(CGRect(x: 0, y: 0, width: width, height: height))

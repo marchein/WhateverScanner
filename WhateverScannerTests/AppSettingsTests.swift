@@ -16,6 +16,20 @@ final class AppSettingsTests: XCTestCase {
         XCTAssertEqual(settings.servers.count, 1)
     }
 
+    func testAddingFirstServerEnablesWebDAVUpload() {
+        let settings = makeSettings()
+        settings.autoUploadToWebDAV = false
+        settings.addServer(makeServer(name: "S1"))
+        XCTAssertTrue(settings.autoUploadToWebDAV)
+    }
+
+    func testAddingFirstSMBServerEnablesSMBUpload() {
+        let settings = makeSettings()
+        settings.autoUploadToSMB = false
+        settings.addSMBServer(makeSMBServer(name: "NAS"))
+        XCTAssertTrue(settings.autoUploadToSMB)
+    }
+
     func testFirstAddedServerBecomesDefault() {
         let settings = makeSettings()
         let server = makeServer(name: "S1")

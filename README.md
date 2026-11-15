@@ -32,7 +32,8 @@ server, and/or an SMB share, all at once if you like.
 
 ## Requirements
 
-- macOS with Xcode 16 or newer (the project targets iOS 18.6+).
+- macOS with Xcode 26 or newer (the app icon uses the Icon Composer `.icon` format;
+  the project targets iOS 18.6+).
 - [XcodeGen](https://github.com/yonaskolb/XcodeGen) to generate the `.xcodeproj` —
   install via Homebrew:
   ```sh
@@ -54,9 +55,12 @@ WhateverScanner/
   ContentView.swift          Root view (launch screen → onboarding or main view)
   Info.plist
   Localizable.xcstrings      String Catalog (en/de)
+  InfoPlist.xcstrings        Localized permission prompts (en/de)
+  PrivacyInfo.xcprivacy      Privacy manifest (required for App Store submissions)
   Models/                    AppSettings, WebDAVServer, SMBServer
   Services/                  KeychainService, PDFService, OCRService, FilesService,
-                             PhotosService, WebDAVService, SMBService
+                             PhotosService, WebDAVService, SMBService, ScanFilename
+  Support/                   Logging (os.Logger) and background-task helpers
   Views/
     Main/                    Main scanning screen
     Scanning/                Scanner, scan preview, document export, share sheet
@@ -160,6 +164,12 @@ User-facing strings live in `WhateverScanner/Localizable.xcstrings`, a Swift
 String Catalog supporting English (source language) and German. Edit it directly
 in Xcode's String Catalog editor, which keeps translation state (`new`,
 `translated`, ...) in sync.
+
+## Releasing (TestFlight / App Store)
+
+See [RELEASE.md](RELEASE.md) for the step-by-step TestFlight and App Store checklist
+(in German), and [PRIVACY.md](PRIVACY.md) for a privacy policy template that has to be
+hosted publicly for App Store Connect.
 
 ## License
 

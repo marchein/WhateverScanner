@@ -185,7 +185,7 @@ struct AddWebDAVServerView: View {
     /// Validates and saves the server configuration, then dismisses the view.
     private func saveServer() {
         let urlString = normalizedURL()
-        guard URL(string: urlString) != nil else { return }
+        guard WebDAVService.validatedBaseURL(urlString) != nil else { return }
 
         let server = WebDAVServer(
             id: existingServer?.id ?? UUID(),

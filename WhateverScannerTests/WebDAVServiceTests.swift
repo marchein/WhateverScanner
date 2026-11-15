@@ -31,6 +31,40 @@ final class WebDAVServiceTests: XCTestCase {
         }
     }
 
+    // MARK: - URL handling
+
+    func testUploadURLPercentEncodesFilename() throws {
+        let server = WebDAVServer(name: "S", url: "https://example.com/dav/", username: "u", password: "p")
+        let filename = "Müller GmbH - Rechnung #1 100%_2024-05-01_13-30-05.pdf"
+        let url = try WebDAVService.uploadURL(for: server, filename: filename)
+        XCTAssertEqual(url.host, "example.com")
+        XCTAssertEqual(url.lastPathComponent, filename)
+        XCTAssertNil(url.query)
+        XCTAssertNil(url.fragment)
+        XCTAssertTrue(url.path.hasPrefix("/dav/"))
+    }
+
+    func testUploadURLWithoutTrailingSlashStillAppendsComponent() throws {
+        let server = WebDAVServer(name: "S", url: "https://example.com/dav", username: "u", password: "p")
+        let url = try WebDAVService.uploadURL(for: server, filename: "a.pdf")
+        XCTAssertEqual(url.path, "/dav/a.pdf")
+    }
+
+    func testValidatedBaseURLRejectsNonHTTPSchemes() {
+        XCTAssertNil(WebDAVService.validatedBaseURL("ftp://example.com/"))
+        XCTAssertNil(WebDAVService.validatedBaseURL("example.com/dav/"))
+        XCTAssertNil(WebDAVService.validatedBaseURL(""))
+    }
+
+    func testValidatedBaseURLAcceptsHTTPAndHTTPS() {
+        XCTAssertNotNil(WebDAVService.validatedBaseURL("https://cloud.example.com/remote.php/dav/files/user/"))
+        XCTAssertNotNil(WebDAVService.validatedBaseURL("http://192.168.1.10:8080/dav/"))
+    }
+
+    func testInsecureConnectionErrorDescription() {
+        XCTAssertNotNil(WebDAVError.insecureConnection.errorDescription)
+    }
+
     // MARK: - WebDAVError descriptions
 
     func testInvalidURLErrorDescription() {

@@ -157,6 +157,11 @@ class AppSettings: ObservableObject {
     /// - Parameter server: The server to add.
     func addServer(_ server: WebDAVServer) {
         savePasswordToKeychain(for: server)
+        // Adding the first server implies the user wants to upload to it
+        // (e.g. after skipping the server setup during onboarding).
+        if servers.isEmpty {
+            autoUploadToWebDAV = true
+        }
         servers.append(server)
         if defaultServerId == nil {
             defaultServerId = server.id
@@ -201,6 +206,10 @@ class AppSettings: ObservableObject {
     /// - Parameter server: The server to add.
     func addSMBServer(_ server: SMBServer) {
         saveSMBPasswordToKeychain(for: server)
+        // Adding the first share implies the user wants to upload to it.
+        if smbServers.isEmpty {
+            autoUploadToSMB = true
+        }
         smbServers.append(server)
         if defaultSMBServerId == nil {
             defaultSMBServerId = server.id
@@ -258,7 +267,11 @@ class AppSettings: ObservableObject {
     /// Saves the server's password to the iOS Keychain.
     /// - Parameter server: The server whose password should be stored.
     private func savePasswordToKeychain(for server: WebDAVServer) {
-        try? KeychainService.save(password: server.password, forKey: server.id.uuidString)
+        do {
+            try KeychainService.save(password: server.password, forKey: server.id.uuidString)
+        } catch {
+            Log.settings.error("Saving WebDAV password failed: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     /// Persist SMB server metadata to UserDefaults (passwords stay in Keychain).
@@ -283,7 +296,11 @@ class AppSettings: ObservableObject {
     /// Saves the SMB server's password to the iOS Keychain.
     /// - Parameter server: The server whose password should be stored.
     private func saveSMBPasswordToKeychain(for server: SMBServer) {
-        try? KeychainService.save(password: server.password, forKey: "smb-" + server.id.uuidString)
+        do {
+            try KeychainService.save(password: server.password, forKey: "smb-" + server.id.uuidString)
+        } catch {
+            Log.settings.error("Saving SMB password failed: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     // MARK: - Keys

@@ -42,6 +42,62 @@ enum FilesService {
     /// - Returns: The resolved folder URL.
     /// - Throws: `FilesServiceError.bookmarkResolutionFailed` if resolution fails.
     static func resolveFolder(from bookmark: Data) throws -> URL {
+        try resolveFolderCheckingStaleness(from: bookmark).url
+    }
+
+    /// Writes data to a file, using the bookmarked folder if one is set, otherwise
+    /// falling back to the app's own Documents folder. An existing file with the same
+    /// name is never overwritten; a numeric suffix is appended instead.
+    /// - Parameters:
+    ///   - data: The file data to write.
+    ///   - filename: The destination filename.
+    ///   - bookmark: The security-scoped bookmark for the destination folder, if any.
+    /// - Returns: A refreshed bookmark if the stored one was stale and should be
+    ///   replaced in the settings, otherwise `nil`.
+    /// - Throws: `FilesServiceError` if the folder cannot be accessed or the write fails.
+    @discardableResult
+    static func save(data: Data, filename: String, bookmark: Data?) throws -> Data? {
+        guard let bookmark else {
+            try write(data, to: uniqueFileURL(in: defaultFolderURL, filename: filename))
+            return nil
+        }
+
+        let (folderURL, isStale) = try resolveFolderCheckingStaleness(from: bookmark)
+        guard folderURL.startAccessingSecurityScopedResource() else {
+            throw FilesServiceError.accessDenied
+        }
+        defer { folderURL.stopAccessingSecurityScopedResource() }
+
+        try write(data, to: uniqueFileURL(in: folderURL, filename: filename))
+
+        // A stale bookmark still resolves, but should be re-created while we have
+        // access, otherwise it may stop working entirely (e.g. after the folder was
+        // moved or the file provider was updated).
+        guard isStale else { return nil }
+        return try? folderURL.bookmarkData(options: [], includingResourceValuesForKeys: nil, relativeTo: nil)
+    }
+
+    /// Returns a URL for `filename` inside `folder` that doesn't exist yet, appending
+    /// " 2", " 3", … to the base name if needed.
+    static func uniqueFileURL(in folder: URL, filename: String) -> URL {
+        let candidate = folder.appendingPathComponent(filename)
+        guard FileManager.default.fileExists(atPath: candidate.path) else { return candidate }
+
+        let base = (filename as NSString).deletingPathExtension
+        let ext = (filename as NSString).pathExtension
+        for index in 2...999 {
+            let name = ext.isEmpty ? "\(base) \(index)" : "\(base) \(index).\(ext)"
+            let url = folder.appendingPathComponent(name)
+            if !FileManager.default.fileExists(atPath: url.path) {
+                return url
+            }
+        }
+        return candidate
+    }
+
+    // MARK: - Private
+
+    private static func resolveFolderCheckingStaleness(from bookmark: Data) throws -> (url: URL, isStale: Bool) {
         do {
             var isStale = false
             let url = try URL(
@@ -50,40 +106,17 @@ enum FilesService {
                 relativeTo: nil,
                 bookmarkDataIsStale: &isStale
             )
-            return url
+            return (url, isStale)
         } catch {
             throw FilesServiceError.bookmarkResolutionFailed(error)
         }
     }
 
-    /// Writes data to a file, using the bookmarked folder if one is set, otherwise
-    /// falling back to the app's own Documents folder.
-    /// - Parameters:
-    ///   - data: The file data to write.
-    ///   - filename: The destination filename.
-    ///   - bookmark: The security-scoped bookmark for the destination folder, if any.
-    /// - Throws: `FilesServiceError` if the folder cannot be accessed or the write fails.
-    static func save(data: Data, filename: String, bookmark: Data?) throws {
-        guard let bookmark else {
-            let fileURL = defaultFolderURL.appendingPathComponent(filename)
-            do {
-                try data.write(to: fileURL, options: .atomic)
-            } catch {
-                throw FilesServiceError.writeFailed(error)
-            }
-            return
-        }
-
-        let folderURL = try resolveFolder(from: bookmark)
-        guard folderURL.startAccessingSecurityScopedResource() else {
-            throw FilesServiceError.accessDenied
-        }
-        defer { folderURL.stopAccessingSecurityScopedResource() }
-
-        let fileURL = folderURL.appendingPathComponent(filename)
+    private static func write(_ data: Data, to url: URL) throws {
         do {
-            try data.write(to: fileURL, options: .atomic)
+            try data.write(to: url, options: .atomic)
         } catch {
+            Log.export.error("Writing file failed: \(error.localizedDescription, privacy: .public)")
             throw FilesServiceError.writeFailed(error)
         }
     }

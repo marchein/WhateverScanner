@@ -25,8 +25,14 @@ class OCRService {
         guard let firstImage = images.first, let cgImage = firstImage.cgImage else {
             return DocumentInfo(suggestedName: nil, documentDate: nil)
         }
+        let orientation = CGImagePropertyOrientation(firstImage.imageOrientation)
 
-        let recognizedText = await performOCR(on: cgImage)
+        // Vision's `perform` is synchronous and CPU-heavy; run it off the caller's
+        // executor (which may be the main actor) so the UI stays responsive.
+        let recognizedText = await Task.detached(priority: .userInitiated) {
+            OCRService.performOCR(on: cgImage, orientation: orientation)
+        }.value
+
         let suggestedName = extractDocumentName(from: recognizedText)
         let documentDate = extractDate(from: recognizedText)
 
@@ -36,33 +42,31 @@ class OCRService {
     // MARK: - OCR
 
     /// Performs text recognition on a single image using VNRecognizeTextRequest.
-    /// - Parameter image: The CGImage to analyze.
+    ///
+    /// The request is performed synchronously and its results are read afterwards
+    /// (instead of using the request's completion handler together with a
+    /// continuation), so there is no risk of resuming a continuation twice when
+    /// Vision both reports an error to the handler and throws from `perform`.
+    /// - Parameters:
+    ///   - image: The CGImage to analyze.
+    ///   - orientation: The orientation of the image's pixel data.
     /// - Returns: An array of recognized text strings, ordered top-to-bottom.
-    private func performOCR(on image: CGImage) async -> [String] {
-        await withCheckedContinuation { continuation in
-            let request = VNRecognizeTextRequest { request, error in
-                guard error == nil,
-                      let observations = request.results as? [VNRecognizedTextObservation] else {
-                    continuation.resume(returning: [])
-                    return
-                }
+    private static func performOCR(on image: CGImage, orientation: CGImagePropertyOrientation) -> [String] {
+        let request = VNRecognizeTextRequest()
+        request.recognitionLevel = .accurate
+        request.usesLanguageCorrection = true
+        request.recognitionLanguages = ["de-DE", "en-US"]
 
-                let texts = observations.compactMap { observation in
-                    observation.topCandidates(1).first?.string
-                }
-                continuation.resume(returning: texts)
-            }
+        let handler = VNImageRequestHandler(cgImage: image, orientation: orientation, options: [:])
+        do {
+            try handler.perform([request])
+        } catch {
+            Log.scan.error("OCR failed: \(error.localizedDescription, privacy: .public)")
+            return []
+        }
 
-            request.recognitionLevel = .accurate
-            request.usesLanguageCorrection = true
-            request.recognitionLanguages = ["de-DE", "en-US"]
-
-            let handler = VNImageRequestHandler(cgImage: image, options: [:])
-            do {
-                try handler.perform([request])
-            } catch {
-                continuation.resume(returning: [])
-            }
+        return (request.results ?? []).compactMap { observation in
+            observation.topCandidates(1).first?.string
         }
     }
 
@@ -318,5 +322,25 @@ class OCRService {
         }
 
         return nil
+    }
+}
+
+// MARK: - Orientation Mapping
+
+extension CGImagePropertyOrientation {
+    /// Maps a `UIImage.Orientation` to the equivalent `CGImagePropertyOrientation`
+    /// so Vision interprets the pixel data the same way UIKit displays it.
+    init(_ orientation: UIImage.Orientation) {
+        switch orientation {
+        case .up: self = .up
+        case .upMirrored: self = .upMirrored
+        case .down: self = .down
+        case .downMirrored: self = .downMirrored
+        case .left: self = .left
+        case .leftMirrored: self = .leftMirrored
+        case .right: self = .right
+        case .rightMirrored: self = .rightMirrored
+        @unknown default: self = .up
+        }
     }
 }
