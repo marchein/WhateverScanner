@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="720" viewBox="0 0 720 720">
+  <!-- Original WhateverScanner glyph: a page inside viewfinder corners. -->
+  <g fill="none" stroke="#FFFFFF" stroke-width="56" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 56 216 V 112 Q 56 56 112 56 H 216"/>
+    <path d="M 504 56 H 608 Q 664 56 664 112 V 216"/>
+    <path d="M 664 504 V 608 Q 664 664 608 664 H 504"/>
+    <path d="M 216 664 H 112 Q 56 664 56 608 V 504"/>
+  </g>
+  <path fill="#FFFFFF" fill-rule="evenodd" d="
+    M 246 150 H 412 L 524 262 V 532 Q 524 576 480 576 H 246 Q 202 576 202 532 V 194 Q 202 150 246 150 Z
+    M 392 196 V 262 Q 392 282 412 282 H 478 Z
+    M 266 330 H 456 A 18 18 0 0 1 456 366 H 266 A 18 18 0 0 1 266 330 Z
+    M 266 402 H 456 A 18 18 0 0 1 456 438 H 266 A 18 18 0 0 1 266 402 Z
+    M 266 474 H 390 A 18 18 0 0 1 390 510 H 266 A 18 18 0 0 1 266 474 Z"/>
+</svg>
