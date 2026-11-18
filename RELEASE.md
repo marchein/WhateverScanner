@@ -50,7 +50,10 @@ verteilt und später im App Store veröffentlicht wird.
 2. Änderungen pushen → Xcode Cloud baut, testet, archiviert und lädt zu TestFlight hoch.
    *Ohne Xcode Cloud:* `xcodegen generate`, in Xcode *Any iOS Device (arm64)* wählen,
    *Product → Archive* → *Distribute App → App Store Connect*. Dabei die Build-Nummer
-   (`CURRENT_PROJECT_VERSION`) bei jedem Upload erhöhen.
+   (`CURRENT_PROJECT_VERSION`) bei jedem Upload erhöhen. Zuletzt manuell hochgeladen: Build 7.
+   Beim Export per `xcodebuild -exportArchive` darauf achten, dass kein Homebrew-`rsync` im `PATH`
+   liegt (sonst bricht das Packen der IPA mit „Copy failed“ ab), z. B.
+   `PATH=/usr/bin:/bin:/usr/sbin:/sbin xcodebuild -exportArchive …`.
 3. In App Store Connect unter *TestFlight*:
    - **Interne Tester** (bis zu 100 Personen aus deinem App-Store-Connect-Team) bekommen den Build sofort.
    - **Externe Tester** (bis zu 10.000, per E-Mail oder öffentlichem Link): Gruppe anlegen,
